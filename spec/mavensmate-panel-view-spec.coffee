@@ -71,9 +71,46 @@ describe 'MavensMate Panel View', ->
       expect(panel.myOutput.find('div#message-my-fake-promiseId').html()).toBe('1 failed test method')
       expect(panel.myOutput.find('div#stackTrace-my-fake-promiseId div pre').html()).toBe('SGToolKit_Batch_SendMessage_Test.shouldFail:\nClass.SGToolKit_Batch_SendMessage_Test.shouldFail: line 135, column 1\n\n')
 
+  # Delete the metadata in the active pane from the server
+  describe 'Delete File from Server', ->
+    filePath = ''
 
+    beforeEach ->
+      # set up the workspace with a fake apex class
+      directory = temp.mkdirSync()
+      atom.project.setPath(directory)
+      filePath = path.join(directory, 'MyApexClass.cls')
+      spyOn(mm, 'run').andCallThrough()
+      
+      waitsForPromise ->
+        atom.workspace.open(filePath)
 
+    it 'should prompt the user', ->
+      spyOn(atom, 'confirm')
+      atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
+      expect(atom.confirm).toHaveBeenCalled()
 
+    it 'should not invoke mavensmate:delete-file-from-server if cancelled', ->
+      spyOn(atom, 'confirm').andReturn(0)
+      atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
+      expect(mm.run).not.toHaveBeenCalled()
+
+    it 'should invoke mavensmate:delete-file-from-server if confirmed', ->
+      spyOn(atom, 'confirm').andReturn(1)
+      atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
+      expect(mm.run).toHaveBeenCalled()
+      expect(mm.run.mostRecentCall.args[0].args.operation).toBe('delete')
+      expect(mm.run.mostRecentCall.args[0].payload.files[0]).toBe(filePath) 
+
+    it 'should tell the user what file is being deleted and if it was successful', ->
+      myParams =  {args: {operation: 'delete', }, promiseId: 'my-fake-promiseId', payload: {files: [filePath]}}
+      successResponse = require './fixtures/mavensmate-panel-view/delete_success.json'
+      emitter.emit 'mavensmatePanelNotifyStart', myParams, 'my-fake-promiseId'
+      emitter.emit 'mavensmatePanelNotifyFinish', myParams, successResponse, 'my-fake-promiseId'
+      console.log panel.myOutput.find('div#command-my-fake-promiseId div').html()
+      expect(panel.myOutput.find('div#command-my-fake-promiseId div').html()).toBe('Deleting MyApexClass.cls...')
+      expect(panel.myOutput.find('div#message-my-fake-promiseId').html()).toBe('Deleted MyApexClass.cls')
+      expect(panel.myOutput.find('div#stackTrace-my-fake-promiseId div pre').html()).toBe('')
 
   # Run unit tests for current class
   describe 'Run Async Unit Tests For This Class', ->

@@ -6,6 +6,17 @@ module.exports =
     file = editor?.buffer.file
     file?.path
 
+  # returns base name for active file
+  activeFileBaseName: ->
+    editor = atom.workspace.getActivePaneItem()
+    file = editor?.buffer.file
+    file?.getBaseName()
+
+  # returns base name for file path
+  # e.g. /workspace/MyApexClass.cls -> MyApexClass.cls
+  baseName: (filePath) ->
+    filePath.split(/[\\/]/).pop()
+
   # whether the given command is a request for a ui
   isUiCommand: (params) ->
     if params.args? and params.args.ui?
@@ -54,6 +65,11 @@ module.exports =
           'Compiling '+params.payload.files[0]
         else
           'Compiling selected metadata' 
+      delete: ->
+        if params.payload.files? and params.payload.files.length is 1
+          'Deleting ' + params.payload.files[0].split(/[\\/]/).pop() # extract base name
+        else
+          'Deleting selected metadata'
 
     if isUi
       msg = uiMessages[command]

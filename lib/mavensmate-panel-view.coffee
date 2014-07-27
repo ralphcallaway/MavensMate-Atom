@@ -147,6 +147,8 @@ class MavensMatePanelView extends View
       obj = @getUiCommandOutput command, params, result
     else
       switch command
+        when 'delete'
+          obj = @getDeleteCommandOutput command, params, result
         when 'compile'
           obj = @getCompileCommandOutput command, params, result
         when 'run_all_tests', 'test_async'
@@ -156,6 +158,17 @@ class MavensMatePanelView extends View
           obj = @getGenericOutput command, params, result
 
     return obj
+
+  getDeleteCommandOutput: (command, params, result) ->
+    if result.success
+      obj = indicator: "success"
+      if params.payload.files? and params.payload.files.length is 1
+        obj.message = 'Deleted ' + util.baseName(params.payload.files[0])
+      else
+        obj.message = "Deleted selected metadata"
+      return obj
+    else
+      @getErrorOutput command, params, result
 
   getUiCommandOutput: (command, params, result) ->
     console.log 'parsing ui'
