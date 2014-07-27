@@ -80,12 +80,12 @@ module.exports =
       # set package default
       # TODO: should we do this elsewhere?
       atom.config.setDefaults 'mavensmate',
-        mm_location: 'mm/mm.py'
+        mm_location: '/Users/ralphcallaway/mm/mm.py'
         mm_compile_on_save : true
         mm_api_version : '30.0'
-        mm_log_location : ''
+        mm_log_location : '/Users/ralphcallaway/mmlogs'
         mm_python_location : '/usr/bin/python'
-        mm_workspace : ['/one/cool/workspace', '/one/not-so-cool/workspace']
+        mm_workspace : ['/Users/ralphcallaway/atom_mm_wkspc']
         mm_open_project_on_create : true
         mm_log_level : 'DEBUG'
 
