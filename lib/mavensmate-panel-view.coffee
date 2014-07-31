@@ -153,7 +153,8 @@ class MavensMatePanelView extends View
           obj = @getCompileCommandOutput command, params, result
         when 'run_all_tests', 'test_async'
           obj = @getRunAsyncTestsCommandOutput command, params, result
-          console.log 'finished getRunAsyncTestsCommandOutput'
+        when 'new_quick_trace_flag'
+          obj = @getNewQuickTraceFlagCommandOutput command, params, result
         else
           obj = @getGenericOutput command, params, result
 
@@ -249,7 +250,6 @@ class MavensMatePanelView extends View
     return obj
 
   getRunAsyncTestsCommandOutput: (command, params, result) ->
-    console.log 'running getRunAllTestsCommandOutput'
     obj =
       message: null
       indicator: 'warning'
@@ -279,7 +279,22 @@ class MavensMatePanelView extends View
 
     return obj
 
+  getNewQuickTraceFlagCommandOutput: (command, params, result) ->
+    obj =
+      message: null
+      indicator: 'warning'
+      stackTrace: ''
+      isException: false
 
+    if result.success is false
+      obj.indicator = 'danger'
+      obj.isException = true
+      obj.stackTrace = result.stack_trace
+    else
+      obj.indicator = 'success'
+
+    obj.message = result.body
+    return obj
 
   # Internal: Update the mavensmate output view contents.
   #

@@ -111,7 +111,7 @@ module.exports =
     startServer: (port) ->
       open = require 'open'
 
-      express = require 'express'
+      express = allowUnsafeEval -> require 'express'
       app = express()
 
       app.use(bodyParser())

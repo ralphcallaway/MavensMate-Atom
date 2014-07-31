@@ -1,0 +1,6 @@
+{
+  "body": "Malformed request...",
+  "promiseId": "my-fake-promiseId",
+  "stack_trace": "some stack trace message returned",
+  "success": false
+}

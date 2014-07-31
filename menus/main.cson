@@ -27,7 +27,7 @@
         'label': 'Debugging'
         'submenu': [
           { 'label': 'New Debug Log...', 'command': 'mavensmate:run-unit-tests' }
-          { 'label': 'New Quick Log', 'command': 'mavensmate:run-unit-tests' }
+          { 'label': 'New Quick Log', 'command': 'mavensmate:new-quick-log' }
           { 'label': 'Fetch Logs', 'command': 'mavensmate:fetch-logs' }
           { 'label': 'Scrub Log', 'command': 'mavensmate:run-unit-tests' }
           { 'label': 'Delete Trace Flags For This User', 'command': 'mavensmate:run-unit-tests' }
