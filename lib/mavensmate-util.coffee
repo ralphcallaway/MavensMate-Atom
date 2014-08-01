@@ -21,6 +21,9 @@ module.exports =
   baseName: (filePath) ->
     filePath.split(/[\\/]/).pop()
 
+  # returns tree view
+  treeView: ->
+    atom.workspaceView.find('.tree-view').view()
 
   # whether the given command is a request for a ui
   isUiCommand: (params) ->

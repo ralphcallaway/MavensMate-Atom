@@ -4,3 +4,9 @@
       'child-1': 'test-submenu:toggle'
       '-': '-'
       'child-2': 'test-submenu:toggle'
+  '.tree-view.multi-select .file':
+    'MavensMate':
+      'Delete Files From Server': 'mavensmate:delete-file-from-server'
+  '.tree-view:not(.multi-select) .file, .pane .item-views':
+    'MavensMate':
+      'Delete File From Server': 'mavensmate:delete-file-from-server'

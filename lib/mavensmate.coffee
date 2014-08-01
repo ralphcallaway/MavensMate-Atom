@@ -102,19 +102,24 @@ module.exports =
         @selectList.toggle()
 
       atom.workspaceView.command "mavensmate:toggle-output", =>
-        @panel.toggle()
+        @panel.toggle()        
 
-      # deletes active file from the server
+      # deletes file(s) from server
       atom.workspaceView.command "mavensmate:delete-file-from-server", =>
-        file = util.activeFile()
+        treeView = util.treeView()
+        if treeView.hasFocus() # clicked in sidebar 
+          filePaths = treeView.selectedPaths()
+        else # command palette or right click in editor
+          filePaths = [util.activeFile()]
         params = 
           args:
             operation: 'delete'
             pane: atom.workspace.getActivePane()
           payload:
-            files: [file]
+            files: filePaths
+        fileString = (filePaths.map (path) -> util.baseName(path)).join(', ')
         answer = atom.confirm
-          message: "Are you sure you want to delete #{util.activeFileBaseName()} file from Salesforce?"
+          message: "Are you sure you want to delete #{fileString} from Salesforce?"
           # NB: specs expects the following buton indices, 0: Cancel, 1: Delete
           #     so that we can simulate button clicks properly in the spec
           buttons: ["Cancel", "Delete"]

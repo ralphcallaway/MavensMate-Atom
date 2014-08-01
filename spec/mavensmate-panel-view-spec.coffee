@@ -2,6 +2,9 @@
 temp    = require 'temp' # npm install temp
 path    = require 'path' # npm install path
 
+# Automatically track and cleanup files at exit
+temp.track();
+
 {WorkspaceView} = require 'atom'
 emitter = require('../lib/mavensmate-emitter').pubsub
 {panel} = require '../lib/mavensmate-panel-view'
@@ -74,43 +77,67 @@ describe 'MavensMate Panel View', ->
   # Delete the metadata in the active pane from the server
   describe 'Delete File from Server', ->
     filePath = ''
-
+    filePaths = []
+    
     beforeEach ->
       # set up the workspace with a fake apex class
       directory = temp.mkdirSync()
       atom.project.setPath(directory)
       filePath = path.join(directory, 'MyApexClass.cls')
+      filePaths = [filePath, path.join(directory,'AnotherClass.cls')]
       spyOn(mm, 'run').andCallThrough()
       
       waitsForPromise ->
+        atom.packages.activatePackage 'tree-view'
+
+      waitsForPromise ->
         atom.workspace.open(filePath)
 
-    it 'should prompt the user', ->
-      spyOn(atom, 'confirm')
-      atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
-      expect(atom.confirm).toHaveBeenCalled()
+    describe 'confirmations', ->
 
-    it 'should not invoke mavensmate:delete-file-from-server if cancelled', ->
-      spyOn(atom, 'confirm').andReturn(0)
-      atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
-      expect(mm.run).not.toHaveBeenCalled()
+      it 'should prompt the user', ->
+        spyOn(atom, 'confirm')
+        atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
+        expect(atom.confirm).toHaveBeenCalled()
 
-    it 'should invoke mavensmate:delete-file-from-server if confirmed', ->
-      spyOn(atom, 'confirm').andReturn(1)
-      atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
-      expect(mm.run).toHaveBeenCalled()
-      expect(mm.run.mostRecentCall.args[0].args.operation).toBe('delete')
-      expect(mm.run.mostRecentCall.args[0].payload.files[0]).toBe(filePath) 
+      it 'should not invoke mavensmate:delete-file-from-server if cancelled', ->
+        spyOn(atom, 'confirm').andReturn(0)
+        atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
+        expect(mm.run).not.toHaveBeenCalled()
 
-    it 'should tell the user what file is being deleted and if it was successful', ->
-      myParams =  {args: {operation: 'delete', }, promiseId: 'my-fake-promiseId', payload: {files: [filePath]}}
-      successResponse = require './fixtures/mavensmate-panel-view/delete_success.json'
-      emitter.emit 'mavensmatePanelNotifyStart', myParams, 'my-fake-promiseId'
-      emitter.emit 'mavensmatePanelNotifyFinish', myParams, successResponse, 'my-fake-promiseId'
-      console.log panel.myOutput.find('div#command-my-fake-promiseId div').html()
-      expect(panel.myOutput.find('div#command-my-fake-promiseId div').html()).toBe('Deleting MyApexClass.cls...')
-      expect(panel.myOutput.find('div#message-my-fake-promiseId').html()).toBe('Deleted MyApexClass.cls')
-      expect(panel.myOutput.find('div#stackTrace-my-fake-promiseId div pre').html()).toBe('')
+      it 'should invoke mavensmate:delete-file-from-server and send a delete call if confirmed', ->
+        spyOn(atom, 'confirm').andReturn(1)
+        atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
+        expect(mm.run).toHaveBeenCalled()
+        expect(mm.run.mostRecentCall.args[0].args.operation).toBe('delete')
+
+    describe 'file selections', ->
+
+      it 'should delete the active file if the sidebar isn\'t focused', ->
+        spyOn(atom, 'confirm').andReturn(1)
+        atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
+        expect(mm.run.mostRecentCall.args[0].payload.files).toEqual([filePath]) 
+
+      it 'should delete the selected files if the sidebar is focused', ->
+        util = require '../lib/mavensmate-util'
+        treeView = util.treeView()
+        spyOn(treeView, 'hasFocus').andReturn(true)
+        spyOn(treeView, 'selectedPaths').andReturn(filePaths)
+        spyOn(atom, 'confirm').andReturn(1)
+        atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
+        expect(mm.run.mostRecentCall.args[0].payload.files).toBe(filePaths)       
+
+    describe 'panel messaging', ->
+
+      it 'should tell the user what file is being deleted and if it was successful', ->
+        myParams =  {args: {operation: 'delete', }, promiseId: 'my-fake-promiseId', payload: {files: [filePath]}}
+        successResponse = require './fixtures/mavensmate-panel-view/delete_success.json'
+        emitter.emit 'mavensmatePanelNotifyStart', myParams, 'my-fake-promiseId'
+        emitter.emit 'mavensmatePanelNotifyFinish', myParams, successResponse, 'my-fake-promiseId'
+        console.log panel.myOutput.find('div#command-my-fake-promiseId div').html()
+        expect(panel.myOutput.find('div#command-my-fake-promiseId div').html()).toBe('Deleting MyApexClass.cls...')
+        expect(panel.myOutput.find('div#message-my-fake-promiseId').html()).toBe('Deleted MyApexClass.cls')
+        expect(panel.myOutput.find('div#stackTrace-my-fake-promiseId div pre').html()).toBe('')
 
   # Run unit tests for current class
   describe 'Run Async Unit Tests For This Class', ->
