@@ -5,6 +5,7 @@ path  = require 'path'
 MavensMateEventEmitter              = require('./mavensmate-emitter').pubsub
 MavensMateLocalServer               = require './mavensmate-local-server'
 MavensMateProjectListView           = require './mavensmate-project-list-view'
+MavensMateErrorView                 = require './mavensmate-error-view'
 MavensMatePanelView                 = require('./mavensmate-panel-view').panel
 MavensMateStatusBarView             = require './mavensmate-status-bar-view'
 MavensMateAppView                   = require './mavensmate-app-view'
@@ -37,9 +38,6 @@ module.exports =
       # @editorView = atom.workspaceView.getActiveView()
       # if @editorView?
       #   {@editor, @gutter} = @editorView
-
-      atom.workspaceView.eachEditorView (editorView) =>
-        @handleBufferEvents editorView
 
       @init()
 
@@ -76,6 +74,12 @@ module.exports =
 
       # @subscribe atom.workspace.eachEditor (editor) =>
       #   @handleEvents(editor)
+
+      atom.project.errors = {}
+      
+      atom.workspaceView.eachEditorView (editorView) =>
+        @handleBufferEvents editorView
+        new MavensMateErrorView(editorView)
 
       # set package default
       # TODO: should we do this elsewhere?
@@ -124,7 +128,7 @@ module.exports =
             operation: 'compile'
             pane: atom.workspace.getActivePane()
           payload:
-            files: [MavensMateUtil.activeFile]
+            files: [util.activeFile()]
         @mm.run(params).then (result) =>
           @mmResponseHandler(params, result)
 
@@ -134,17 +138,27 @@ module.exports =
           args:
             operation: 'compile_project'
             pane: atom.workspace.getActivePane()
-        @mm.run(params).then (result) =>
-          @mmResponseHandler(params, result)
+        atom.confirm
+          message: 'Confirm Compile Project'
+          detailedMessage: 'Would you like to compile the project?'
+          buttons:
+            'Yes': => @mm.run(params).then (result) =>
+                      @mmResponseHandler(params, result)
+            'No': null
 
-      # compiles entire project
+      # cleans entire project
       atom.workspaceView.command "mavensmate:clean-project", =>
         params =
           args:
             operation: 'clean_project'
             pane: atom.workspace.getActivePane()
-        @mm.run(params).then (result) =>
-          @mmResponseHandler(params, result)
+        atom.confirm
+          message: 'Confirm Clean Project'
+          detailedMessage: 'Are you sure you want to clean this project? All local (non-server) files will be deleted and your project will be refreshed from the server.'
+          buttons:
+            'Yes': => @mm.run(params).then (result) =>
+                      @mmResponseHandler(params, result)
+            'No': null
 
       # compiles entire project
       atom.workspaceView.command "mavensmate:reset-metadata-container", =>
@@ -350,14 +364,6 @@ module.exports =
       else
         atom.packages.once 'activated', ->
           createStatusEntry()
-
-      emitter.on 'mavensmateCompileErrorBufferNotify', (command, params, result, errorLines) ->
-        params.args.editorView.gutter.removeClassFromAllLines 'mm-compile-error'
-        for line in errorLines
-          params.args.editorView.gutter.addClassToLine line-1, 'mm-compile-error'
-
-      emitter.on 'mavensmateCompileSuccessBufferNotify', (params) ->
-        params.args.editorView.gutter.removeClassFromAllLines 'mm-compile-error'
 
       atom.packages.activatePackage("autocomplete-plus")
         .then (pkg) =>

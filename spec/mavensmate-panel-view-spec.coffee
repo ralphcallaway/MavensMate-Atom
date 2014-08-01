@@ -163,7 +163,6 @@ describe 'MavensMate Panel View', ->
       expect(panel.myOutput.find('div#message-my-fake-promiseId').html()).toBe('1 failed test method')
       expect(panel.myOutput.find('div#stackTrace-my-fake-promiseId div pre').html()).toBe('SGToolKit_Batch_SendMessage_Test.shouldFail:\nClass.SGToolKit_Batch_SendMessage_Test.shouldFail: line 135, column 1\n\n')
 
-
   # Fetch Logs
   describe 'Fetch Logs', ->
     it 'should indicate how many logs were fetched', ->
@@ -177,6 +176,21 @@ describe 'MavensMate Panel View', ->
       # ensure the correct message was set
       expect(panel.myOutput.find('div#message-my-fake-promiseId').html()).toBe('4 Logs successfully downloaded')
       expect(panel.myOutput.find('div#stackTrace-my-fake-promiseId div pre').html()).toBe('')
+
+  describe 'Compile Project', ->
+    beforeEach ->
+      spyOn(panel, 'getCompileProjectCommandOutput').andCallThrough()
+      spyOn(mm, 'run').andCallThrough()
+
+    it 'should invoke mavensmate:compile-project', ->
+      spyOn(atom, 'confirm').andReturn(1)
+      atom.workspaceView.trigger 'mavensmate:compile-project'
+      
+      expect(atom.confirm).toHaveBeenCalled()
+
+    it 'should indicate when it is done compiling', ->
+      myParams = {args: {operation: 'compile_project'}, promiseId: 'my-fake-promiseId'}
+      successResponse = require('./fixtures/mavensmate-panel-view/compile_project_success.json')
 
   # New Quick Log
   describe 'New Quick Log', ->
@@ -230,7 +244,7 @@ describe 'MavensMate Panel View', ->
       emitter.emit 'mavensmatePanelNotifyStart', myParams, 'my-fake-promiseId'
       emitter.emit 'mavensmatePanelNotifyFinish', myParams, successResponse, 'my-fake-promiseId'
 
-      # ensure that getRunAsyncTestsCommandOutput has been called with expected params
+      # ensure the correct message was set
       expect(panel.getGenericOutput).toHaveBeenCalled()
       expect(panel.getGenericOutput).toHaveBeenCalledWith('generic_command', myParams, successResponse)
 

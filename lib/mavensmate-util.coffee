@@ -6,6 +6,10 @@ module.exports =
     file = editor?.buffer.file
     file?.path
 
+
+  stripPath: (filePath) ->
+    return filePath.replace(/^.*[\\\/]/, '')
+
   # returns base name for active file
   activeFileBaseName: ->
     editor = atom.workspace.getActivePaneItem()
@@ -16,6 +20,7 @@ module.exports =
   # e.g. /workspace/MyApexClass.cls -> MyApexClass.cls
   baseName: (filePath) ->
     filePath.split(/[\\/]/).pop()
+
 
   # whether the given command is a request for a ui
   isUiCommand: (params) ->
