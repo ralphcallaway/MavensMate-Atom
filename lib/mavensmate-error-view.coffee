@@ -26,7 +26,7 @@ class MavensMateErrorView
 
   refreshMarkers: ->
     return unless @gutter.isVisible()
-    if @editor.getPath() then currentFileName = util.stripPath(@editor.getPath())
+    if @editor.getPath() then currentFileName = util.baseName(@editor.getPath())
     @clearMarkers()
 
     errors = atom.project.errors[currentFileName] ? []

@@ -249,14 +249,37 @@ describe 'MavensMate Panel View', ->
   
   describe 'Reset Metadata Container', ->
     beforeEach ->
-      spyOn(panel, 'getGenericOutput').andCallThrough()
       spyOn(mm, 'run').andCallThrough()
+      spyOn(atom, 'confirm').andReturn(0)
 
     it 'should invoke mavensmate:reset-metadata-container', ->
-      spyOn(atom, 'confirm').andReturn(1)
-      atom.workspaceView.trigger 'mavensmate:reset-metadata-container'
-      
-      expect(atom.confirm).toHaveBeenCalled()
+      atom.workspaceView.trigger 'mavensmate:reset-metadata-container'    
+
+      expect(mm.run).toHaveBeenCalled()
+      expect(mm.run.mostRecentCall.args[0].args.operation).toBe('reset_metadata_container')
+
+  
+  describe 'Clean Project', ->
+    beforeEach ->
+      spyOn(mm, 'run').andCallThrough()
+      spyOn(atom, 'confirm').andReturn(0)
+
+    it 'should invoke mavensmate:clean-project', ->
+      atom.workspaceView.trigger 'mavensmate:clean-project'
+
+      expect(mm.run).toHaveBeenCalled()
+      expect(mm.run.mostRecentCall.args[0].args.operation).toBe('clean_project')
+
+  describe 'Compile Project', ->
+    beforeEach ->
+      spyOn(mm, 'run').andCallThrough()
+      spyOn(atom, 'confirm').andReturn(0)
+
+    it 'should invoke mavensmate:compile-project', ->
+      atom.workspaceView.trigger 'mavensmate:compile-project'
+
+      expect(mm.run).toHaveBeenCalled()
+      expect(mm.run.mostRecentCall.args[0].args.operation).toBe('compile_project')
 
   describe 'Generic Operations', ->
     beforeEach ->

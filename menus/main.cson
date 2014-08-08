@@ -20,7 +20,7 @@
           { 'label': 'New VisualForce Page', 'command': 'mavensmate:run-tests' }
           { 'label': 'New Visualforce Component', 'command': 'mavensmate:run-tests' }
           { 'label': 'List Fields For Object... (beta)', 'command': 'mavensmate:run-tests' }
-          { 'label': 'Update Project Metadata Index (.org_metadata)', 'command': 'mavensmate:run-tests' }
+          { 'label': 'Update Project Metadata Index (.org_metadata)', 'command': 'mavensmate:index-metadata' }
         ]
       }
       {
@@ -32,11 +32,7 @@
           { 'label': 'Scrub Log', 'command': 'mavensmate:run-unit-tests' }
           { 'label': 'Delete Trace Flags For This User', 'command': 'mavensmate:run-unit-tests' }
           { '-': '-' }
-          { 'label': 'New Apex Checkpoint...', 'command': 'mavensmate:run-unit-tests' }
-          { 'label': 'Delete Apex Checkpoint...', 'command': 'mavensmate:run-unit-tests' }
-          { 'label': 'Fetch Checkpoints', 'command': 'mavensmate:run-unit-tests' }
-          { 'label': 'Show Apex Checkpoints For This File', 'command': 'mavensmate:run-unit-tests' }
-          { 'label': 'Hide Apex Checkpoints For This File', 'command': 'mavensmate:run-unit-tests' }
+          { 'label': 'Fetch Checkpoints', 'command': 'mavensmate:refresh-checkpoints' }
         ]
       }
       {

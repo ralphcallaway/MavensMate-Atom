@@ -6,6 +6,7 @@ MavensMateEventEmitter              = require('./mavensmate-emitter').pubsub
 MavensMateLocalServer               = require './mavensmate-local-server'
 MavensMateProjectListView           = require './mavensmate-project-list-view'
 MavensMateErrorView                 = require './mavensmate-error-view'
+MavensMateCheckpointHandler         = require './mavensmate-checkpoint-handler'
 MavensMatePanelView                 = require('./mavensmate-panel-view').panel
 MavensMateStatusBarView             = require './mavensmate-status-bar-view'
 MavensMateAppView                   = require './mavensmate-app-view'
@@ -76,10 +77,19 @@ module.exports =
       #   @handleEvents(editor)
 
       atom.project.errors = {}
-      
+      atom.project.checkpointCount = 0
+      if atom.project.path
+        try
+          data = fs.readFileSync atom.project.path + '/config/.overlays'
+          overlays = JSON.parse data
+          atom.project.checkpointCount = overlays.length
+        catch error
+          console.log error
+
       atom.workspaceView.eachEditorView (editorView) =>
         @handleBufferEvents editorView
         new MavensMateErrorView(editorView)
+        new MavensMateCheckpointHandler(editorView, @mm, @mmResponseHandler)
 
       # set package default
       # TODO: should we do this elsewhere?
@@ -107,11 +117,11 @@ module.exports =
       # deletes file(s) from server
       atom.workspaceView.command "mavensmate:delete-file-from-server", =>
         treeView = util.treeView()
-        if treeView.hasFocus() # clicked in sidebar 
+        if treeView.hasFocus() # clicked in sidebar
           filePaths = treeView.selectedPaths()
         else # command palette or right click in editor
           filePaths = [util.activeFile()]
-        params = 
+        params =
           args:
             operation: 'delete'
             pane: atom.workspace.getActivePane()
@@ -125,7 +135,7 @@ module.exports =
           buttons: ["Cancel", "Delete"]
         if answer == 1 # 1 => Delete
           @mm.run(params).then (result) =>
-            @mmResponseHandler(params, result)              
+            @mmResponseHandler(params, result)
 
       atom.workspaceView.command "mavensmate:compile", =>
         params =
@@ -143,13 +153,13 @@ module.exports =
           args:
             operation: 'compile_project'
             pane: atom.workspace.getActivePane()
-        atom.confirm
+        answer = atom.confirm
           message: 'Confirm Compile Project'
           detailedMessage: 'Would you like to compile the project?'
-          buttons:
-            'Yes': => @mm.run(params).then (result) =>
-                      @mmResponseHandler(params, result)
-            'No': null
+          buttons: ['Yes', 'No']
+        if answer == 0 # Yes
+          @mm.run(params).then (result) =>
+            @mmResponseHandler(params, result)
 
       # cleans entire project
       atom.workspaceView.command "mavensmate:clean-project", =>
@@ -157,27 +167,58 @@ module.exports =
           args:
             operation: 'clean_project'
             pane: atom.workspace.getActivePane()
-        atom.confirm
+        answer = atom.confirm
           message: 'Confirm Clean Project'
           detailedMessage: 'Are you sure you want to clean this project? All local (non-server) files will be deleted and your project will be refreshed from the server.'
-          buttons:
-            'Yes': => @mm.run(params).then (result) =>
-                      @mmResponseHandler(params, result)
-            'No': null
+          buttons: ['Yes', 'No']
+        if answer == 0 # Yes
+          @mm.run(params).then (result) =>
+            @mmResponseHandler(params, result)
 
-      # compiles entire project
+      # reset metadata container
       atom.workspaceView.command "mavensmate:reset-metadata-container", =>
         params =
           args:
             operation: 'reset_metadata_container'
             pane: atom.workspace.getActivePane()
-        atom.confirm
+        answer = atom.confirm
           message: 'Reset Metadata Container'
           detailedMessage: 'Are you sure you want to reset the metadata container?'
-          buttons:
-            'Yes': => @mm.run(params).then (result) =>
-                      @mmResponseHandler(params, result)
-            'No': null
+          buttons: ['Yes', 'No']
+        if answer == 0 # Yes
+          @mm.run(params).then (result) =>
+            @mmResponseHandler(params, result)
+
+      # index metadata
+      atom.workspaceView.command "mavensmate:index-metadata", (event)=>
+        params =
+          args:
+            operation: 'index_metadata'
+            pane: atom.workspace.getActivePane()
+        @mm.run(params).then (result) =>
+          @mmResponseHandler(params, result)
+
+      # refresh metadata
+      atom.workspaceView.command "mavensmate:refresh-selected-metadata", (event)=>
+        filesToRefresh = []
+        fileNamesToRefresh = []
+        atom.workspaceView.find('.selected .icon-file-text').each (index, element) =>
+          filesToRefresh.push(util.filePathFromTreePath($(element).data('path')))
+
+        if filesToRefresh.length > 0
+          params =
+            args:
+              operation: 'refresh'
+              pane: atom.workspace.getActivePane()
+            payload:
+              files: filesToRefresh
+          answer = atom.confirm
+            message: 'Refresh Selected Metadata'
+            detailedMessage: "Are you sure you want to overwrite the selected files' contents from Salesforce?"
+            buttons: ['Yes', 'No']
+          if answer == 0 # Yes
+            @mm.run(params).then (result) =>
+              @mmResponseHandler(params, result)
 
       # runs all tests
       atom.workspaceView.command "mavensmate:run-all-tests-async", =>
@@ -352,13 +393,21 @@ module.exports =
           @mmResponseHandler(params, result)
 
       # fetch logs
-      atom.workspaceView.command "mavensmate:fetch-logs", =>
+      atom.workspaceView.command 'mavensmate:fetch-logs', =>
         params =
           args:
             operation: 'fetch_logs'
             pane: atom.workspace.getActivePane()
         @mm.run(params).then (result) =>
           @mmResponseHandler(params, result)
+
+      atom.workspaceView.command 'mavensmate:refresh-checkpoints', =>
+          params =
+            args:
+              operation: 'index_apex_overlays'
+              pane: atom.workspace.getActivePane()
+          @mm.run(params).then (result) =>
+            @mmResponseHandler params, result
 
       # places mavensmate 3 dot icon in the status bar
       createStatusEntry = =>

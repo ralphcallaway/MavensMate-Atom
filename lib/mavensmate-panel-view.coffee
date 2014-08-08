@@ -211,7 +211,7 @@ class MavensMatePanelView extends View
       stackTrace: null
       isException: false
 
-    filesCompiled = (util.stripPath(filePath) for filePath in params.payload.files ? [])
+    filesCompiled = (util.baseName(filePath) for filePath in params.payload.files ? [])
 
     for compiledFile in filesCompiled
       atom.project.errors[compiledFile] = []
@@ -275,7 +275,7 @@ class MavensMatePanelView extends View
 
         message = 'Compile Project Failed'
         for error in errors
-          errorFileName = util.stripPath(error.fileName)
+          errorFileName = util.baseName(error.fileName)
           errorMessage = "#{errorFileName}: #{error.problem} (Line: #{error.lineNumber}, Column: #{error.columnNumber})"
           message += '<br/>' + errorMessage
 

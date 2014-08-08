@@ -114,7 +114,7 @@ module.exports =
       express = allowUnsafeEval -> require 'express'
       app = express()
 
-      app.use(bodyParser())
+      app.use(bodyParser.json())
       app.use(@enableCors)
 
       app.set('tracker', @promiseTracker); #todo: should server have its own instance?

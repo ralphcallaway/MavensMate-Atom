@@ -21,7 +21,7 @@
   background-color: red;
 }
 
-.mm-compile-error-line {  
+.mm-compile-error-line {
   visibility: visible !important;
   background-color: #f233a6;
   color: white;
@@ -49,23 +49,23 @@
 
 // top left
 svg.busy circle.circle1 {
-  -webkit-animation-name: circle1Busy; 
-  -webkit-animation-duration: 2.0s; 
-  -webkit-animation-iteration-count: infinite; 
+  -webkit-animation-name: circle1Busy;
+  -webkit-animation-duration: 2.0s;
+  -webkit-animation-iteration-count: infinite;
 }
 
 // bottom left
 svg.busy circle.circle2 {
-  -webkit-animation-name: circle2Busy; 
-  -webkit-animation-duration: 2.0s; 
-  -webkit-animation-iteration-count: infinite; 
+  -webkit-animation-name: circle2Busy;
+  -webkit-animation-duration: 2.0s;
+  -webkit-animation-iteration-count: infinite;
 }
 
 // middle right
 svg.busy circle.circle3 {
-  -webkit-animation-name: circle3Busy; 
-  -webkit-animation-duration: 2.0s; 
-  -webkit-animation-iteration-count: infinite; 
+  -webkit-animation-name: circle3Busy;
+  -webkit-animation-duration: 2.0s;
+  -webkit-animation-iteration-count: infinite;
 }
 
 @-webkit-keyframes circle1Busy {
@@ -75,7 +75,7 @@ svg.busy circle.circle3 {
   50% {
     fill: #009edf;
   }
-  to { 
+  to {
     fill: #C3C3C2;
   }
 }
@@ -87,7 +87,7 @@ svg.busy circle.circle3 {
   50% {
     fill: #4e76bb;
   }
-  to { 
+  to {
     fill: #C3C3C2;
   }
 }
@@ -97,9 +97,9 @@ svg.busy circle.circle3 {
     fill: #C3C3C2;
   }
   50% {
-    fill: #85469b; 
+    fill: #85469b;
   }
-  to { 
+  to {
     fill: #C3C3C2;
   }
 }
@@ -116,7 +116,7 @@ svg.busy circle.circle3 {
 }
 
 .mavensmate {
-   
+
 
   h3 {
     padding: 11px;
@@ -242,16 +242,35 @@ svg.busy circle.circle3 {
 
   progress.pending[value]::-webkit-progress-value {
     position: relative;
-    
+
     background-size: 35px 20px, 100% 100%, 100% 100%;
     border-radius:3px;
-    
+
     /* Let's animate this */
     animation: animate-stripes 5s linear infinite;
     -webkit-animation: animate-stripes 5s linear infinite;
   }
 
   @keyframes animate-stripes { 100% { background-position: -100px 0; } }
+}
 
-
+.editor .gutter {
+  div.line-number.mm-checkpoint-gutter {
+    background: #009edf;
+  }
+  div.line-number.mm-checkpoint-gutter-processing {
+    background-image:
+      -webkit-linear-gradient( 135deg,
+                             transparent,
+                             transparent 33%,
+                             rgba(0,0,0,.1) 33%,
+                             rgba(0,0,0,.1) 66%,
+                             transparent 66%),
+      -webkit-linear-gradient( top,
+                              rgba(255, 255, 255, .25),
+                              rgba(0,0,0,.2)),
+       -webkit-linear-gradient( left, #009edf, #4e76bb, #85469b
+    );
+    -webkit-animation: animate-stripes 5s linear infinite;
+  }
 }
