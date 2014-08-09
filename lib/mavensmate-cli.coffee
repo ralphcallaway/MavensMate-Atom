@@ -42,7 +42,7 @@ class MavensMateCommandLineInterface
 
     # return unless atom.project.path? TODO: ensure mavensmate project 
 
-    cfg = atom.config.getSettings().mavensmate
+    cfg = atom.config.getSettings()['MavensMate-Atom']
 
     #console.log cfg
 
@@ -51,7 +51,7 @@ class MavensMateCommandLineInterface
     operation = if args.operation then args.operation else payload.command
 
     if cfg.mm_location == 'mm/mm.py'
-      mm_location = path.join(atom.packages.resolvePackagePath('mavensmate'),cfg.mm_location)
+      mm_location = path.join(atom.packages.resolvePackagePath('MavensMate-Atom'),cfg.mm_location)
     else
       mm_location = cfg.mm_location
 

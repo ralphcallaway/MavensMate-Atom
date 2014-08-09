@@ -67,7 +67,7 @@ module.exports =
 
       # start the local express.js server, returns a promise, set the server port that was randomly selected
       @localHttpServer = new MavensMateLocalServer().start().then (result) =>
-        atom.config.set('mavensmate.mm_server_port', result)
+        atom.config.set('MavensMate-Atom.mm_server_port', result)
 
       # instantiate mavensmate panel, show it
       @panel = MavensMatePanelView
@@ -90,18 +90,6 @@ module.exports =
         @handleBufferEvents editorView
         new MavensMateErrorView(editorView)
         new MavensMateCheckpointHandler(editorView, @mm, @mmResponseHandler)
-
-      # set package default
-      # TODO: should we do this elsewhere?
-      atom.config.setDefaults 'mavensmate',
-        mm_location: '/Users/ralphcallaway/mm/mm.py'
-        mm_compile_on_save : true
-        mm_api_version : '30.0'
-        mm_log_location : '/Users/ralphcallaway/mmlogs'
-        mm_python_location : '/usr/bin/python'
-        mm_workspace : ['/Users/ralphcallaway/atom_mm_wkspc']
-        mm_open_project_on_create : true
-        mm_log_level : 'DEBUG'
 
       ##COMMANDS TODO: move
 
