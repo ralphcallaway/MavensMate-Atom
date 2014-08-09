@@ -8,7 +8,7 @@ describe 'Main Loader', ->
 
     beforeEach ->
       waitsForPromise ->
-        atom.packages.activatePackage 'mavensmate'
+        atom.packages.activatePackage 'MavensMate-Atom'
 
     it 'are defined', ->
 

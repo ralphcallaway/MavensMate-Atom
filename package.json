@@ -1,5 +1,5 @@
 {
-  "name": "mavensmate",
+  "name": "MavensMate-Atom",
   "main": "./lib/main",
   "version": "0.10.0",
   "description": "Develop Force.com applications inside Atom.io",

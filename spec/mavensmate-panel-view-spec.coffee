@@ -18,7 +18,7 @@ describe 'MavensMate Panel View', ->
 
     # activate the mavensmate package
     waitsForPromise ->
-      atom.packages.activatePackage('mavensmate')
+      atom.packages.activatePackage('MavensMate-Atom')
 
   it 'should be defined', ->
     expect(panel).toBeDefined()

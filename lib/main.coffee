@@ -17,7 +17,6 @@ module.exports =
   # i think we want to keep each MavensMate() instance tied to a project, but not 100% sure how to approach that
   activate: =>
     console.log 'activating mavensmate'
-    console.log atom.workspaceView
     @mavensmate = new MavensMate()
 
   deactivate: =>
