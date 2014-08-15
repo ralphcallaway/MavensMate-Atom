@@ -1,14 +1,18 @@
 module.exports =
-	# setting object to configure MavensMate for future SFDC updates
-	sfdcSettings:
-		maxCheckpoints: 5
+  # setting object to configure MavensMate for future SFDC updates
+  sfdcSettings:
+    maxCheckpoints: 5
+
+  typeIsArray: (value) ->
+    Array.isArray or (value) ->
+      {}.toString.call(value) is "[object Array]"
 
   # returns the fully resolved file path given a path relative to the root of the project
   filePathFromTreePath: (treePath) ->
     atom.project.resolve('./' + treePath)
 
-	# returns the active file path
-	activeFile: ->
+  # returns the active file path
+  activeFile: ->
     editor = atom.workspace.getActivePaneItem()
     file = editor?.buffer.file
     file?.path
@@ -117,6 +121,6 @@ module.exports =
     else
       params.payload.command
 
-	# whether the given file is a trigger or apex class
-	isClassOrTrigger: (currentFile) ->
-		return currentFile? and (currentFile.indexOf('.trigger') >= 0 or currentFile.indexOf('.cls') >= 0)
+  # whether the given file is a trigger or apex class
+  isClassOrTrigger: (currentFile) ->
+    return currentFile? and (currentFile.indexOf('.trigger') >= 0 or currentFile.indexOf('.cls') >= 0)

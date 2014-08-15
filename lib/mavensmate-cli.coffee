@@ -26,21 +26,21 @@ class MavensMateCommandLineInterface
   #
   # Returns promise.
   run: (params) ->
-    deferred = Q.defer()  
+    deferred = Q.defer()
 
     args = params.args or {}
     payload = params.payload
     promiseId = params.promiseId
 
     if not promiseId?
-      promiseId = tracker.enqueuePromise()   
+      promiseId = tracker.enqueuePromise()
 
     # console.log 'executing command'
     # console.log args
     # console.log payload
     # console.log promiseId
 
-    # return unless atom.project.path? TODO: ensure mavensmate project 
+    # return unless atom.project.path? TODO: ensure mavensmate project
 
     cfg = atom.config.getSettings()['MavensMate-Atom']
 
@@ -55,8 +55,8 @@ class MavensMateCommandLineInterface
     else
       mm_location = cfg.mm_location
 
-    cmd = cfg.mm_python_location+' '+mm_location+' '+operation
-    
+    cmd = cfg.mm_python_location+' "'+mm_location+'" '+operation
+
     # ui operations
     if 'ui' of args && args['ui']
       if operation in util.modalCommands()
@@ -78,9 +78,7 @@ class MavensMateCommandLineInterface
         cmd = cmd + ' '+arg
 
     # add piped JSON payload
-    payloadString = " <<< '"+JSON.stringify(payload)+"'";
-
-    cmd = cmd + ' ' + payloadString
+    cmd = "echo '" + JSON.stringify(payload) + "'| " + cmd
 
     console.log cmd
 
@@ -106,7 +104,7 @@ class MavensMateCommandLineInterface
         console.log 'COMMAND RESULT -->'
         console.log exception
         console.log stdout
-        
+
         jsonSTDOUT = JSON.parse stdout
         if promiseId?
           jsonSTDOUT.promiseId = promiseId
@@ -119,4 +117,3 @@ class MavensMateCommandLineInterface
 
 mm = new MavensMateCommandLineInterface()
 exports.mm = mm
-

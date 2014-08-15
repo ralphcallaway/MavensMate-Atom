@@ -1,5 +1,6 @@
 {SelectListView} = require 'atom'
 fs = require 'fs'
+util = require './mavensmate-util'
 
 module.exports =
 class MavensMateProjectListView extends SelectListView
@@ -22,8 +23,8 @@ class MavensMateProjectListView extends SelectListView
     dirs = []
     cfg = atom.config.getSettings()['MavensMate-Atom']
     workspaces = cfg.mm_workspace
-    
-    if cfg.mm_workspace.indexOf(',') == -1
+
+    if not util.typeIsArray cfg.mm_workspace
       workspaces = [ cfg.mm_workspace ]
     for workspace in workspaces
       if fs.existsSync workspace
