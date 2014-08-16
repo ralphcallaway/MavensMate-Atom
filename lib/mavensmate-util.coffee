@@ -3,6 +3,10 @@ module.exports =
   sfdcSettings:
     maxCheckpoints: 5
 
+  # returns true if autocomplete-plus is installed
+  isAutocompletePlusInstalled: ->
+    atom.packages.getAvailablePackageNames().indexOf('autocomplete-plus') > -1
+
   typeIsArray: (value) ->
     Array.isArray or (value) ->
       {}.toString.call(value) is "[object Array]"

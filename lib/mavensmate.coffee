@@ -17,6 +17,7 @@ util                                = require './mavensmate-util'
 MavensMateEventHandler              = require('./mavensmate-event-handler').handler
 emitter                             = require('./mavensmate-emitter').pubsub
 MavensMateCodeAssistProviders       = require './mavensmate-code-assist-providers'
+{exec}                              = require 'child_process'
 
 window.jQuery = $
 require '../scripts/bootstrap'
@@ -407,11 +408,20 @@ module.exports =
         atom.packages.once 'activated', ->
           createStatusEntry()
 
+      if !util.isAutocompletePlusInstalled()
+        @installAutocompletePlus()
+      else 
+        @enableAutocomplete()
+
+    installAutocompletePlus: ->
+      cmd = "#{atom.packages.getApmPath()} install autocomplete-plus"
+      exec cmd, @enableAutocomplete 
+
+    enableAutocomplete: ->
       atom.packages.activatePackage("autocomplete-plus")
         .then (pkg) =>
           @autocomplete = pkg.mainModule
           @registerProviders()
-
 
     registerProviders: ->
       @editorSubscription = atom.workspaceView.eachEditorView (editorView) =>
