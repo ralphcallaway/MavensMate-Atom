@@ -1,3 +1,5 @@
+{$, $$, $$$, EditorView, View} = require 'atom'
+
 module.exports =
   # setting object to configure MavensMate for future SFDC updates
   sfdcSettings:
@@ -24,13 +26,16 @@ module.exports =
   # returns base name for active file
   activeFileBaseName: ->
     editor = atom.workspace.getActivePaneItem()
-    file = editor?.buffer.file
+    file = editor?.buffer?.file
     file?.getBaseName()
 
   # returns base name for file path
   # e.g. /workspace/MyApexClass.cls -> MyApexClass.cls
   baseName: (filePath) ->
     filePath.split(/[\\/]/).pop()
+
+  extension: (filePath) ->
+    '.' + filePath.split(/[.]/).pop()
 
   # returns tree view
   treeView: ->
@@ -124,6 +129,20 @@ module.exports =
       params.args.operation
     else
       params.payload.command
+
+  # filters the selected items against metadata extensions
+  getSelectedFiles: ->
+    selectedFilePaths = []
+    apex_file_extensions = atom.config.getSettings()['MavensMate-Atom'].mm_apex_file_extensions
+    treeView = this.treeView()
+    if treeView.hasFocus() # clicked in sidebar
+      filePaths = treeView.selectedPaths()
+    else # command palette or right click in editor
+      filePaths = [this.activeFile()]
+    for filePath in filePaths
+      if this.extension(filePath) in apex_file_extensions
+        selectedFilePaths.push(filePath)
+    return selectedFilePaths
 
   # whether the given file is a trigger or apex class
   isClassOrTrigger: (currentFile) ->

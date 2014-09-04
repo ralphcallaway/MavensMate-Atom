@@ -67,7 +67,8 @@ module.exports =
       @mm = MavensMateCommandLineInterface
 
       # start the local express.js server, returns a promise, set the server port that was randomly selected
-      @localHttpServer = new MavensMateLocalServer().start().then (result) =>
+      @localHttpServer = new MavensMateLocalServer()
+      @localHttpServer.start().then (result) =>
         atom.config.set('MavensMate-Atom.mm_server_port', result)
 
       # instantiate mavensmate panel, show it
@@ -150,6 +151,17 @@ module.exports =
           @mm.run(params).then (result) =>
             @mmResponseHandler(params, result)
 
+      # compiles selected metadata
+      atom.workspaceView.command "mavensmate:compile-selected-metadata", =>
+        params =
+          args:
+            operation: 'compile'
+            pane: atom.workspace.getActivePane()
+          payload:
+            files: util.getSelectedFiles()
+        @mm.run(params).then (result) =>
+          @mmResponseHandler(params, result)
+
       # cleans entire project
       atom.workspaceView.command "mavensmate:clean-project", =>
         params =
@@ -189,10 +201,8 @@ module.exports =
 
       # refresh metadata
       atom.workspaceView.command "mavensmate:refresh-selected-metadata", (event)=>
-        filesToRefresh = []
+        filesToRefresh = util.getSelectedFiles()
         fileNamesToRefresh = []
-        atom.workspaceView.find('.selected .icon-file-text').each (index, element) =>
-          filesToRefresh.push(util.filePathFromTreePath($(element).data('path')))
 
         if filesToRefresh.length > 0
           params =
@@ -410,12 +420,12 @@ module.exports =
 
       if !util.isAutocompletePlusInstalled()
         @installAutocompletePlus()
-      else 
+      else
         @enableAutocomplete()
 
     installAutocompletePlus: ->
       cmd = "#{atom.packages.getApmPath()} install autocomplete-plus"
-      exec cmd, @enableAutocomplete 
+      exec cmd, @enableAutocomplete
 
     enableAutocomplete: ->
       atom.packages.activatePackage("autocomplete-plus")
@@ -441,11 +451,21 @@ module.exports =
     # Public: Deactivate the package and destroy the mavensmate views.
     #
     # Returns nothing.
-    deactivate: ->
-      @mavensMateAppView.destroy()
+    destroy: ->
+      # stop/destroy local express server
+      @localHttpServer.destroy()
+      delete @localHttpServer
+    
+      # remove MavensMate items from the status bar
       @mavensmateStatusBar?.destroy()
       @mavensmateStatusBar = null
-      @localHttpServer.destroy()
+
+      # remove the MavensMate panel
+      @panel.destroy()
+      @panel = null
+
+      #unsubscribe from all listeners
+      @unsubscribe()
 
     mmResponseHandler: (params, result) ->
       tracker.pop(result.promiseId).result

@@ -57,44 +57,11 @@ module.exports =
     #
     # Returns nothing.
     destroy: ->
-      atom.workspace.eachEditor (editor) =>
-        @unsubscribeBufferEvents(editor)
       @detach()
+      @unsubscribe()
 
     setBusy: (busy) ->
       if busy
         $('#mavensmateSvgIcon').attr('class', 'busy')
       else
         $('#mavensmateSvgIcon').attr('class', '')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

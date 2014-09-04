@@ -355,9 +355,11 @@ class MavensMatePanelView extends View
     # @myOutput.prepend '<div class="panel-item"><div>'+operation+'</div></div>'
 
   # Internal: Detach and destroy the mavensmate output view.
-  #
+  #           clear the existing panel items.
   # Returns nothing.
   destroy: ->
+    $('.panel-item').remove()
+    @unsubscribe()
     @detach()
 
   # Internal: Toggle the visibilty of the mavensmate output view.

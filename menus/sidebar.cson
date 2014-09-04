@@ -6,13 +6,16 @@
   #     'child-2': 'test-submenu:toggle'
   '.workspace .line-number':
     'MavensMate':
-      'Refresh From Server': 'mavensmate:refresh-selected-metadata'
       'child-1': 'test-submenu:toggle'
       '-': '-'
       'child-2': 'test-submenu:toggle'
   '.tree-view.multi-select .file':
     'MavensMate':
-      'Delete Files From Server': 'mavensmate:delete-file-from-server'
+      'Delete Files From Server': 'mavensmate:delete-file-from-server'      
+      'Refresh From Server': 'mavensmate:refresh-selected-metadata'
+      'Compile Files': 'mavensmate:compile-selected-metadata'
   '.tree-view:not(.multi-select) .file, .pane .item-views':
     'MavensMate':
-      'Delete File From Server': 'mavensmate:delete-file-from-server'
+      'Delete File From Server': 'mavensmate:delete-file-from-server'            
+      'Refresh From Server': 'mavensmate:refresh-selected-metadata'
+      'Compile File': 'mavensmate:compile-selected-metadata'
