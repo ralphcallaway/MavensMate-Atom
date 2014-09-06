@@ -1,0 +1,98 @@
+<apex:page showHeader="true" sidebar="true" standardController="Match__c" recordSetVar="matches" extensions="MatchController">
+	<apex:stylesheet value="{!urlfor($Resource.PingPongResc, '/css/bootstrap.css')}"/>
+	<apex:stylesheet value="{!urlfor($Resource.PingPongResc, '/css/bootstrap-flat.css')}"/>
+    <apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/>
+
+    <div class="container">
+<!--     	<div class="row">
+    		<div class="span8 offset2" style="margin-bottom: 20px; margin-top: 20px;">
+    			<img src="http://i.imgur.com/q9qG2N5.jpg"/>
+			</div>
+    	</div> -->
+    	<apex:repeat value="{!matches}" var="match">
+	    	<div id="match{!match.Id}" class="row matchDetail" style="display: none; margin-bottom: 40px;">
+		    		<div class="span3">
+		    			<img src="{!match.Player1__r.Player_Image__c}" style="max-height: 200px;" class="center-block"/>
+		    			{!match.Player1__r.Name}
+		    			<span class="badge center-block" style="font-size: 5em; margin-top:40px; color: black;"><apex:outputField value="{!match.Player_1_Points__c}"/></span>
+		    		</div>
+		    		<div class="span2">
+		    			{!match.Name}
+		    			<img src="http://i.imgur.com/kPATJxt.png" />
+		    		</div>
+		    		<div class="span3">
+		    			<img src="{!match.Player2__r.Player_Image__c}" style="max-height: 200px;" class="center-block"/>
+		    			{!match.Player2__r.Name}
+		    			<span class="badge center-block" style="font-size: 5em; margin-top:40px; color: black;"><apex:outputField value="{!match.Player_2_Points__c}" /></span>
+		    		</div>
+	    	</div>
+    	</apex:repeat>
+		<div class="row">
+			<div class="span8">
+				<table class="table table-hover table-bordered table-condensed">
+					<thead>
+						<tr><th>Match</th><th><span class="text-danger">Player 1</span></th><th><span class="text-info">Player 2</span></th></tr>
+					</thead>
+				<tbody>
+						<apex:form id="matchform">
+							<apex:repeat value="{!matches}" var="match">
+								<tr class="matchRow">
+									<td class="matchName" id="{!match.Id}" >
+										{!match.Name}: {!match.Player1__r.Name} <span class="text-danger">(P1 <apex:outputPanel rendered="{!match.Player_1_Serving__c = true}"><img style="max-height:20px; max-width:20px;" src="http://i.imgur.com/ig8oG7G.png" /></apex:outputPanel>)</span> vs {!match.Player2__r.Name} <span class="text-info">(P2<apex:outputPanel rendered="{!match.Player_1_Serving__c = false}"><img style="max-height:20px; max-width:20px;" src="http://i.imgur.com/ig8oG7G.png" /></apex:outputPanel>)</span>
+									</td>
+									<td>
+										<apex:outputField value="{!match.Player_1_Points__c}"/>
+										<apex:commandLink action="{!pointScored}" rendered="{!match.Player_1_Points__c < 12 && match.Player_2_Points__c < 12}">
+											<apex:param name="match"
+												value="{!match.Id}"
+												assignTo="{!pointMatchId}"/>
+											<apex:param name="scorer"
+												value="{!match.Player1__r.Id}"
+												assignTo="{!pointScorerId}"/>
+											<button type="button" class="btn btn-default btn-danger">
+												<span class="glyphicon glyphicon-plus text-danger"/>
+											</button>
+										</apex:commandLink>
+									</td>
+									<td>
+										<apex:outputField value="{!match.Player_2_Points__c}"/>
+										<apex:commandLink action="{!pointScored}" rendered="{!match.Player_1_Points__c < 12 && match.Player_2_Points__c < 12}">
+											<apex:param name="match"
+												value="{!match.Id}"
+												assignTo="{!pointMatchId}"/>
+											<apex:param name="scorer"
+												value="{!match.Player2__r.Id}"
+												assignTo="{!pointScorerId}"/>
+											<button type="button" class="btn btn-default btn-info">
+												<span class="glyphicon glyphicon-plus text-info"/>
+											</button>
+										</apex:commandLink>
+									</td>
+								</tr>
+							</apex:repeat>
+						</apex:form>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('.matchName').click(function() {
+
+				$('.matchRow').removeClass('success');
+
+				matchSelected($(this).attr("Id"));
+				$(this).parent().addClass('success');
+			});
+
+			$('.matchName').first().trigger('click');
+		});
+
+		function matchSelected(matchId){
+
+			$('.matchDetail').hide();
+			$('#match'+matchId).show();
+		}
+	</script>
+</apex:page>

@@ -12,13 +12,14 @@ emitter = require('../lib/mavensmate-emitter').pubsub
 
 describe 'MavensMate Panel View', ->
   beforeEach ->
+    atom.project.setPath(path.join(__dirname, 'fixtures', 'testProject'))
     # set up the workspace
     atom.workspaceView = new WorkspaceView()
     atom.workspace = atom.workspaceView.model
 
     # activate the mavensmate package
     waitsForPromise ->
-      atom.packages.activatePackage('MavensMate-Atom')
+      atom.packages.activatePackage 'MavensMate-Atom'
 
   it 'should be defined', ->
     expect(panel).toBeDefined()
@@ -78,7 +79,7 @@ describe 'MavensMate Panel View', ->
   describe 'Delete File from Server', ->
     filePath = ''
     filePaths = []
-    
+
     beforeEach ->
       # set up the workspace with a fake apex class
       directory = temp.mkdirSync()
@@ -86,7 +87,7 @@ describe 'MavensMate Panel View', ->
       filePath = path.join(directory, 'MyApexClass.cls')
       filePaths = [filePath, path.join(directory,'AnotherClass.cls')]
       spyOn(mm, 'run').andCallThrough()
-      
+
       waitsForPromise ->
         atom.packages.activatePackage 'tree-view'
 
@@ -116,7 +117,7 @@ describe 'MavensMate Panel View', ->
       it 'should delete the active file if the sidebar isn\'t focused', ->
         spyOn(atom, 'confirm').andReturn(1)
         atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
-        expect(mm.run.mostRecentCall.args[0].payload.files).toEqual([filePath]) 
+        expect(mm.run.mostRecentCall.args[0].payload.files).toEqual([filePath])
 
       it 'should delete the selected files if the sidebar is focused', ->
         util = require '../lib/mavensmate-util'
@@ -125,7 +126,7 @@ describe 'MavensMate Panel View', ->
         spyOn(treeView, 'selectedPaths').andReturn(filePaths)
         spyOn(atom, 'confirm').andReturn(1)
         atom.workspaceView.trigger 'mavensmate:delete-file-from-server'
-        expect(mm.run.mostRecentCall.args[0].payload.files).toBe(filePaths)       
+        expect(mm.run.mostRecentCall.args[0].payload.files).toBe(filePaths)
 
     describe 'panel messaging', ->
 
@@ -212,7 +213,7 @@ describe 'MavensMate Panel View', ->
     it 'should invoke mavensmate:compile-project', ->
       spyOn(atom, 'confirm').andReturn(1)
       atom.workspaceView.trigger 'mavensmate:compile-project'
-      
+
       expect(atom.confirm).toHaveBeenCalled()
 
     it 'should indicate when it is done compiling', ->
@@ -246,19 +247,19 @@ describe 'MavensMate Panel View', ->
       expect(panel.myOutput.find('div#message-my-fake-promiseId').html()).toBe('Malformed request...')
       expect(panel.myOutput.find('div#stackTrace-my-fake-promiseId div pre').html()).not.toBe('')
       expect(panel.myOutput.find('div.progress-bar').hasClass('progress-bar-danger')).toBe(true)
-  
+
   describe 'Reset Metadata Container', ->
     beforeEach ->
       spyOn(mm, 'run').andCallThrough()
       spyOn(atom, 'confirm').andReturn(0)
 
     it 'should invoke mavensmate:reset-metadata-container', ->
-      atom.workspaceView.trigger 'mavensmate:reset-metadata-container'    
+      atom.workspaceView.trigger 'mavensmate:reset-metadata-container'
 
       expect(mm.run).toHaveBeenCalled()
       expect(mm.run.mostRecentCall.args[0].args.operation).toBe('reset_metadata_container')
 
-  
+
   describe 'Clean Project', ->
     beforeEach ->
       spyOn(mm, 'run').andCallThrough()

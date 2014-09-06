@@ -1,0 +1,19 @@
+{
+    "username": "dhelmer+mmpp@mavensconsulting.com", 
+    "project_name": "Testing", 
+    "org_url": "", 
+    "namespace": "", 
+    "metadata_container": "1dc20000000HFWCAA4", 
+    "environment": "developer", 
+    "workspace": "/Users/davidhelmer/Dropbox/workspace/mavensmateatom", 
+    "id": "U8Y6B6I0ASOHNAYG49S4FGH4XYNVXRYX", 
+    "subscription": [
+        "ApexClass", 
+        "ApexComponent", 
+        "ApexPage", 
+        "ApexTrigger", 
+        "StaticResource", 
+        "CustomObject", 
+        "Profile"
+    ]
+}

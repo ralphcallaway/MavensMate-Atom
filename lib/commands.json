@@ -1,0 +1,120 @@
+{
+    "projectCommands" : {
+        "compile": {
+            "operation": "compile",
+            "payloadFiles": "active"
+        },
+        "compile-project": {
+            "operation": "compile_project",
+            "confirm": {
+                "message": "Confirm Compile Project",
+                "detailedMessage": "Would you like to compile the project?",
+                "buttons": ["Yes", "No"]
+            }
+        },
+        "compile-selected-metadata": {
+            "operation": "compile",
+            "payloadFiles": "selected"
+        },
+        "clean-project": {
+            "operation": "clean_project",
+            "confirm": {
+              "message": "Confirm Clean Project",
+              "detailedMessage": "Are you sure you want to clean this project? All local (non-server) files will be deleted and your project will be refreshed from the server.",
+              "buttons": ["Yes", "No"]
+            }
+        },
+        "reset-metadata-container": {
+            "operation": "reset_metadata_container",
+            "confirm": {
+              "message": "Reset Metadata Container",
+              "detailedMessage": "Are you sure you want to reset the metadata container?",
+              "buttons": ["Yes", "No"]
+            }
+        },
+        "index-metadata": {
+            "operation": "index_metadata"
+        },
+        "refresh-selected-metadata": {
+            "operation": "refresh",
+            "payloadFiles": "selected",
+            "confirm": {
+              "message": "Refresh Selected Metadata",
+              "detailedMessage": "Are you sure you want to overwrite the selected files' contents from Salesforce?",
+              "buttons": ["Yes", "No"]
+            }            
+        },
+        "run-all-tests-async": {
+            "operation": "run_all_tests"
+        },
+        "run-async-unit-tests": {
+            "operation": "test_async",
+            "payloadClasses": "activeBaseName"
+        },
+        "edit-project": {
+            "operation": "edit_project",
+            "ui": true
+        },
+        "upgrade-project": {
+            "operation": "upgrade_project",
+            "ui": true
+        },
+        "new-apex-class": {
+            "operation": "new_metadata",
+            "ui": true,
+            "payloadMetadata": "ApexClass"
+        },
+        "new-apex-trigger": {
+            "operation": "new_metadata",
+            "ui": true,
+            "payloadMetadata": "ApexTrigger"
+        },
+        "new-visualforce-page": {
+            "operation": "new_metadata",
+            "ui": true,
+            "payloadMetadata": "Visualforce Page"
+        },
+        "new-visualforce-component": {
+            "operation": "new_metadata",
+            "ui": true,
+            "payloadMetadata": "Visualforce Component"
+        },
+        "run-apex-unit-tests": {
+            "operation": "unit_test",
+            "ui": true
+        },
+        "deploy-to-server": {
+            "operation": "deploy",
+            "ui": true
+        },
+        "execute-apex": {
+            "operation": "execute_apex",
+            "ui": true
+        },
+        "new-project-from-existing-directory": {
+            "operation": "new_project_from_existing_directory",
+            "ui": true
+        },
+        "new-trace-flag": {
+            "operation": "debug_log",
+            "ui": true
+        },
+        "connect-to-github": {
+            "operation": "github",
+            "ui": true
+        },
+        "project-health-check": {
+            "operation": "project_health_check",
+            "ui": true
+        },
+        "new-quick-log": {
+            "operation": "new_quick_trace_flag"
+        },
+        "fetch-logs": {
+            "operation": "fetch_logs"
+        },
+        "refresh-checkpoints": {
+            "operation": "index_apex_overlays"
+        }
+    }
+}

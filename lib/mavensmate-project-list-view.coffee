@@ -14,6 +14,7 @@ class MavensMateProjectListView extends SelectListView
 
   # opens new atom window for selected project
   confirmed: (item) ->
+    console.log ('opening project: ' + item.path)
     atom.open options =
       pathsToOpen: [item.path]
 

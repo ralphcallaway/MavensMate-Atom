@@ -20,11 +20,13 @@ module.exports =
       @mm = mm
 
     stop: ->
-      @httpServer.close()
+      if @httpServer?
+        @httpServer.close()
 
     # # Tear down any state and detach
     destroy: ->
-      @httpServer.close()
+      if @httpServer?
+        @httpServer.close()
 
     # returns promise
     #
