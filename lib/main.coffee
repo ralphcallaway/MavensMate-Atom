@@ -23,6 +23,5 @@ module.exports =
 
   deactivate: =>
     console.log 'deactivating mavensmate'
-    @mavensmate.destroy()
+    @mavensmate?.destroy()
     delete @mavensmate
-

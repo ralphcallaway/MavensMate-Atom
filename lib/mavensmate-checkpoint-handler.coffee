@@ -12,6 +12,7 @@ module.exports =
       { @editor, @gutter } = @editorView
       @mm = mm
       @responseHandler = rh
+      @editor.checkpointHandler = this
 
       @initialize()
       @refreshMarkers()

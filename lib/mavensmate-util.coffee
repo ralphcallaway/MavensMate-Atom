@@ -1,5 +1,6 @@
-{$, $$, $$$, EditorView, View} = require 'atom'
+{$, $$, $$$, EditorView, View}  = require 'atom'
 fs                              = require 'fs'
+path                            = require 'path' # npm install path
 
 module.exports =
   # setting object to configure MavensMate for future SFDC updates
@@ -132,9 +133,8 @@ module.exports =
       params.payload.command
 
   isMavensMateProject: ->
-    settingsPath = atom.project.path + '/config/.settings'
-    oldSettingsPath = atom.project.path + '/config/settings.yaml'
-
+    settingsPath = path.join(atom.project.path, 'config','.settings')
+    oldSettingsPath = path.join(atom.project.path ,'config','settings.yaml')
 
     return fs.existsSync(settingsPath) or fs.existsSync(oldSettingsPath)
 

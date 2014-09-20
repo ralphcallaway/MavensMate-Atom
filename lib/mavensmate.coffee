@@ -118,7 +118,7 @@ module.exports =
       atom.project.checkpointCount = 0
       if atom.project.path
         try
-          data = fs.readFileSync atom.project.path + '/config/.overlays'
+          data = fs.readFileSync path.join(atom.project.path, 'config','.overlays')
           overlays = JSON.parse data
           atom.project.checkpointCount = overlays.length
         catch error

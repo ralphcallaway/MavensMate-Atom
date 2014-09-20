@@ -27,7 +27,6 @@ module.exports =
     destroy: ->
       if @httpServer?
         @httpServer.close()
-
     # returns promise
     #
     # promise resolves with port number
@@ -114,7 +113,7 @@ module.exports =
 
 
 
-    startServer: (port) ->      
+    startServer: (port) ->
       express = allowUnsafeEval -> require 'express'
       app = express()
 

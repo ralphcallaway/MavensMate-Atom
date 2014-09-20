@@ -75,6 +75,71 @@ describe 'MavensMate Panel View', ->
       expect(panel.myOutput.find('div#message-my-fake-promiseId').html()).toBe('1 failed test method')
       expect(panel.myOutput.find('div#stackTrace-my-fake-promiseId div pre').html()).toBe('SGToolKit_Batch_SendMessage_Test.shouldFail:\nClass.SGToolKit_Batch_SendMessage_Test.shouldFail: line 135, column 1\n\n')
 
+  # Refresh Selected metadata
+  describe 'Refresh Metadata', ->
+    filePath = ''
+    filePaths = []
+
+    beforeEach ->
+      # set up the workspace with a fake apex class
+      directory = temp.mkdirSync()
+      atom.project.setPath(directory)
+      filePath = path.join(directory, 'MyApexClass.cls')
+      filePaths = [filePath, path.join(directory,'AnotherClass.cls')]
+      spyOn(mm, 'run').andCallThrough()
+
+      waitsForPromise ->
+        atom.packages.activatePackage 'tree-view'
+
+      waitsForPromise ->
+        atom.workspace.open(filePath)
+
+    describe 'confirmations', ->
+
+      it 'should prompt the user', ->
+        spyOn(atom, 'confirm')
+        atom.workspaceView.trigger 'mavensmate:refresh-selected-metadata'
+        expect(atom.confirm).toHaveBeenCalled()
+
+      it 'should not invoke mavensmate:refresh-selected-metadata if cancelled', ->
+        spyOn(atom, 'confirm').andReturn(1)
+        atom.workspaceView.trigger 'mavensmate:refresh-selected-metadata'
+        expect(mm.run).not.toHaveBeenCalled()
+
+      it 'should invoke mavensmate:refresh-selected-metadata and send a refresh call if confirmed', ->
+        spyOn(atom, 'confirm').andReturn(0)
+        atom.workspaceView.trigger 'mavensmate:refresh-selected-metadata'
+        expect(mm.run).toHaveBeenCalled()
+        expect(mm.run.mostRecentCall.args[0].args.operation).toBe('refresh')
+
+    describe 'file selections', ->
+
+      it 'should refresh the active file if the sidebar isn\'t focused', ->
+        spyOn(atom, 'confirm').andReturn(0)
+        atom.workspaceView.trigger 'mavensmate:refresh-selected-metadata'
+        expect(mm.run.mostRecentCall.args[0].payload.files).toEqual([filePath])
+
+      it 'should refresh the selected files if the sidebar is focused', ->
+        util = require '../lib/mavensmate-util'
+        treeView = util.treeView()
+        spyOn(treeView, 'hasFocus').andReturn(true)
+        spyOn(treeView, 'selectedPaths').andReturn(filePaths)
+        spyOn(atom, 'confirm').andReturn(0)
+        atom.workspaceView.trigger 'mavensmate:refresh-selected-metadata'
+        expect(mm.run.mostRecentCall.args[0].payload.files).toEqual(filePaths)
+
+    describe 'panel messaging', ->
+
+      it 'should tell the user what file is being Refreshed and if it was successful', ->
+        myParams =  {args: {operation: 'refresh', }, promiseId: 'my-fake-promiseId', payload: {files: [filePath]}}
+        successResponse = require './fixtures/mavensmate-panel-view/generic_success.json'
+        emitter.emit 'mavensmatePanelNotifyStart', myParams, 'my-fake-promiseId'
+        emitter.emit 'mavensmatePanelNotifyFinish', myParams, successResponse, 'my-fake-promiseId'
+        console.log panel.myOutput.find('div#command-my-fake-promiseId div').html()
+        expect(panel.myOutput.find('div#command-my-fake-promiseId div').html()).toBe('Refreshing ' + filePath + '...')
+        expect(panel.myOutput.find('div#message-my-fake-promiseId').html()).toBe('Operation completed successfully')
+        expect(panel.myOutput.find('div#stackTrace-my-fake-promiseId div pre').html()).toBe('')
+
   # Delete the metadata in the active pane from the server
   describe 'Delete File from Server', ->
     filePath = ''
@@ -270,17 +335,6 @@ describe 'MavensMate Panel View', ->
 
       expect(mm.run).toHaveBeenCalled()
       expect(mm.run.mostRecentCall.args[0].args.operation).toBe('clean_project')
-
-  describe 'Compile Project', ->
-    beforeEach ->
-      spyOn(mm, 'run').andCallThrough()
-      spyOn(atom, 'confirm').andReturn(0)
-
-    it 'should invoke mavensmate:compile-project', ->
-      atom.workspaceView.trigger 'mavensmate:compile-project'
-
-      expect(mm.run).toHaveBeenCalled()
-      expect(mm.run.mostRecentCall.args[0].args.operation).toBe('compile_project')
 
   describe 'Generic Operations', ->
     beforeEach ->
