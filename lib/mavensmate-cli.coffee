@@ -46,16 +46,21 @@ class MavensMateCommandLineInterface
 
     #console.log cfg
 
+    # figure out where we're executing from
     cmd = null
-
-    operation = if args.operation then args.operation else payload.command
-
-    if cfg.mm_location == 'mm/mm.py'
-      mm_location = path.join(atom.packages.resolvePackagePath('MavensMate-Atom'),cfg.mm_location)
+    
+    if util.useMMPython()
+      # developer mode running uncompiled python
+      cmd = "#{cfg.mm_python_path} \"#{cfg.mm_mm_py_location}\""
     else
-      mm_location = cfg.mm_location
+      # otherwise using compiled python
+      cmd = "\"#{util.mmHome()}/mm"
+      cmd += ".exe" if util.isWindows()
+      cmd += "\""
 
-    cmd = cfg.mm_python_location+' "'+mm_location+'" '+operation
+    # add in requested operation
+    operation = if args.operation then args.operation else payload.command
+    cmd += " #{operation}"
 
     # ui operations
     if 'ui' of args && args['ui']

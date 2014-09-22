@@ -1,5 +1,6 @@
 logs/
 node_modules/
+/mm/
 
 *.log
 *.orig

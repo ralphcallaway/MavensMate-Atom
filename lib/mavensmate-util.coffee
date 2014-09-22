@@ -1,161 +1,214 @@
-{$, $$, $$$, EditorView, View}  = require 'atom'
-fs                              = require 'fs'
-path                            = require 'path' # npm install path
+fs      = require 'fs'
+os      = require 'os'
+path    = require 'path'
 
 module.exports =
-  # setting object to configure MavensMate for future SFDC updates
-  sfdcSettings:
-    maxCheckpoints: 5
 
-  # returns true if autocomplete-plus is installed
-  isAutocompletePlusInstalled: ->
-    atom.packages.getAvailablePackageNames().indexOf('autocomplete-plus') > -1
+  class MMUtil
 
-  typeIsArray: (value) ->
-    Array.isArray or (value) ->
-      {}.toString.call(value) is "[object Array]"
+    # setting object to configure MavensMate for future SFDC updates
+    @sfdcSettings:
+      maxCheckpoints: 5
 
-  # returns the fully resolved file path given a path relative to the root of the project
-  filePathFromTreePath: (treePath) ->
-    atom.project.resolve('./' + treePath)
+    # returns platform flag (windows|osx|linux[default])
+    @platform: ->
+      return 'windows' if process.platform == 'win32'
+      return 'osx' if process.platform == 'darwin'
+      return 'linux'
 
-  # returns the active file path
-  activeFile: ->
-    editor = atom.workspace.getActivePaneItem()
-    file = editor?.buffer.file
-    file?.path
+    @isWindows: ->
+      @platform() == 'windows'
 
-  # returns base name for active file
-  activeFileBaseName: ->
-    editor = atom.workspace.getActivePaneItem()
-    file = editor?.buffer?.file
-    file?.getBaseName()
+    @isLinux: ->
+      @platform() == 'linux'
 
-  # returns base name for file path
-  # e.g. /workspace/MyApexClass.cls -> MyApexClass.cls
-  baseName: (filePath) ->
-    filePath.split(/[\\/]/).pop()
+    @isMac: ->
+      @platform() == 'osx'
 
-  extension: (filePath) ->
-    '.' + filePath.split(/[.]/).pop()
+    # returns true if user is mac and is on 10.8 + system
+    # see http://en.wikipedia.org/wiki/Darwin_%28operating_system%29#Release_history
+    # for mapping of os.version() return values, i.e. 12.0 => OS X 10.8
+    @isOSX108Plus: ->
+      @isMac() and parseInt os.release() >= 12
 
-  # returns tree view
-  treeView: ->
-    atom.workspaceView.find('.tree-view').view()
+    # get the currently installed mm version
+    @getMMVersion: ->
+      atom.config.get 'MavensMate-Atom.mm_installed_version'
 
-  # whether the given command is a request for a ui
-  isUiCommand: (params) ->
-    if params.args? and params.args.ui?
-      params.args.ui
-    else
-      false
+    # set the currently installed version mm version
+    @setMMVersion: (version) ->
+      atom.config.set 'MavensMate-Atom.mm_installed_version', version
 
-  # ui commands that use a modal (others use an atom pane)
-  modalCommands: ->
-    [
-      'new_project',
-      'edit_project',
-      'upgrade_project',
-      'unit_test',
-      'deploy',
-      'execute_apex',
-      'new_project_from_existing_directory',
-      'debug_log',
-      'github',
-      'project_health_check',
-      'new_metadata'
-    ]
+    # returns true if mm is installed
+    @isMMInstalled: ->
+      (@getMMVersion()?)
 
-  # list of commands that do not have status displayed in the panel
-  panelExemptCommands: ->
-    [
-      'get_indexed_metadata',
-      'deploy',
-      'get_active_session',
-      'new_apex_overlay',
-      'delete_apex_overlay',
-      'index_apex_overlays'
-    ]
+    # returns full path for atom package home
+    @mmPackageHome: ->
+      atom.packages.resolvePackagePath('MavensMate-Atom')
 
-  # returns the command message to be displayed in the panel
-  panelCommandMessage: (params, command, isUi=false) ->
-    console.log params
-
-    # todo: move objects to global?
-    uiMessages =
-      new_project : 'Opening new project panel'
-      edit_project : 'Opening edit project panel'
-
-    messages =
-      new_project : 'Creating new project'
-      compile_project: 'Compiling project'
-      index_metadata: 'Indexing metadata'
-      compile: ->
-        if params.payload.files? and params.payload.files.length is 1
-          'Compiling '+params.payload.files[0]
-        else
-          'Compiling selected metadata'
-      delete: ->
-        if params.payload.files? and params.payload.files.length is 1
-          'Deleting ' + params.payload.files[0].split(/[\\/]/).pop() # extract base name
-        else
-          'Deleting selected metadata'
-      refresh: ->
-        if params.payload.files? and params.payload.files.length is 1
-          'Refreshing ' + params.payload.files[0]
-        else
-          'Refreshing selected metadata'
-
-    if isUi
-      msg = uiMessages[command]
-    else
-      msg = messages[command]
-
-    console.log 'msgggggg'
-    console.log msg
-    console.log Object.prototype.toString.call msg
-
-    if msg?
-      if Object.prototype.toString.call(msg) is '[object Function]'
-        return msg() + '...'
+    # returns full path for mm core api
+    @mmHome: ->
+      if atom.config.get('MavensMate-Atom.mm_path') == 'default'
+        path.join(@mmPackageHome(),'mm')
       else
-        return msg + '...'
-    else
-      return 'Running operation...'
+        atom.config.get('MavensMate-Atom.mm_path')
+
+    # returns true if user is in dev mode
+    # and has a valid python setup
+    @useMMPython: ->
+      # RC-TODO: add checks to validate mm_python_path and mm_mm_py_location are good
+      atom.config.get('MavensMate-Atom.mm_developer_mode') == true
 
 
-  # returns the name of the command
-  # useful because the command can reside in args or payload
-  getCommandName: (params) ->
-    if params.args? and params.args.operation?
-      params.args.operation
-    else
-      params.payload.command
+    # returns true if autocomplete-plus is installed
+    @isAutocompletePlusInstalled: ->
+      atom.packages.getAvailablePackageNames().indexOf('autocomplete-plus') > -1
 
-  isMavensMateProject: ->
-    settingsPath = path.join(atom.project.path, 'config','.settings')
-    oldSettingsPath = path.join(atom.project.path ,'config','settings.yaml')
+    @typeIsArray: (value) ->
+      Array.isArray or (value) ->
+        {}.toString.call(value) is "[object Array]"
 
-    return fs.existsSync(settingsPath) or fs.existsSync(oldSettingsPath)
+    # returns the fully resolved file path given a path relative to the root of the project
+    @filePathFromTreePath: (treePath) ->
+      atom.project.resolve('./' + treePath)
 
-  isMetadata: (filePath) ->    
-    apex_file_extensions = atom.config.getSettings()['MavensMate-Atom'].mm_apex_file_extensions
-    return this.extension(filePath) in apex_file_extensions
+    # returns the active file path
+    @activeFile: ->
+      editor = atom.workspace.getActivePaneItem()
+      file = editor?.buffer.file
+      file?.path
 
-  # filters the selected items against metadata extensions
-  getSelectedFiles: ->
-    selectedFilePaths = []
-    apex_file_extensions = atom.config.getSettings()['MavensMate-Atom'].mm_apex_file_extensions
-    treeView = this.treeView()
-    if treeView.hasFocus() # clicked in sidebar
-      filePaths = treeView.selectedPaths()
-    else # command palette or right click in editor
-      filePaths = [this.activeFile()]
-    for filePath in filePaths
-      if this.extension(filePath) in apex_file_extensions
-        selectedFilePaths.push(filePath)
-    return selectedFilePaths
+    # returns base name for active file
+    @activeFileBaseName: ->
+      editor = atom.workspace.getActivePaneItem()
+      file = editor?.buffer?.file
+      file?.getBaseName()
 
-  # whether the given file is a trigger or apex class
-  isClassOrTrigger: (currentFile) ->
-    return currentFile? and (currentFile.indexOf('.trigger') >= 0 or currentFile.indexOf('.cls') >= 0)
+    # returns base name for file path
+    # e.g. /workspace/MyApexClass.cls -> MyApexClass.cls
+    @baseName: (filePath) ->
+      filePath.split(/[\\/]/).pop()
+
+    @extension: (filePath) ->
+      '.' + filePath.split(/[.]/).pop()
+
+    # returns tree view
+    @treeView: ->
+      atom.workspaceView.find('.tree-view').view()
+
+    # whether the given command is a request for a ui
+    @isUiCommand: (params) ->
+      if params.args? and params.args.ui?
+        params.args.ui
+      else
+        false
+
+    # ui commands that use a modal (others use an atom pane)
+    @modalCommands: ->
+      [
+        'new_project',
+        'edit_project',
+        'upgrade_project',
+        'unit_test',
+        'deploy',
+        'execute_apex',
+        'new_project_from_existing_directory',
+        'debug_log',
+        'github',
+        'project_health_check',
+        'new_metadata'
+      ]
+
+    # list of commands that do not have status displayed in the panel
+    @panelExemptCommands: ->
+      [
+        'get_indexed_metadata',
+        'deploy',
+        'get_active_session',
+        'new_apex_overlay',
+        'delete_apex_overlay',
+        'index_apex_overlays'
+      ]
+
+    # returns the command message to be displayed in the panel
+    @panelCommandMessage: (params, command, isUi=false) ->
+      console.log params
+
+      # todo: move objects to global?
+      uiMessages =
+        new_project : 'Opening new project panel'
+        edit_project : 'Opening edit project panel'
+
+      messages =
+        new_project : 'Creating new project'
+        compile_project: 'Compiling project'
+        index_metadata: 'Indexing metadata'
+        compile: ->
+          if params.payload.files? and params.payload.files.length is 1
+            'Compiling '+params.payload.files[0]
+          else
+            'Compiling selected metadata'
+        delete: ->
+          if params.payload.files? and params.payload.files.length is 1
+            'Deleting ' + params.payload.files[0].split(/[\\/]/).pop() # extract base name
+          else
+            'Deleting selected metadata'
+        refresh: ->
+          if params.payload.files? and params.payload.files.length is 1
+            'Refreshing ' + params.payload.files[0]
+          else
+            'Refreshing selected metadata'
+
+      if isUi
+        msg = uiMessages[command]
+      else
+        msg = messages[command]
+
+      console.log 'msgggggg'
+      console.log msg
+      console.log Object.prototype.toString.call msg
+
+      if msg?
+        if Object.prototype.toString.call(msg) is '[object Function]'
+          return msg() + '...'
+        else
+          return msg + '...'
+      else
+        return 'Running operation...'
+
+
+    # returns the name of the command
+    # useful because the command can reside in args or payload
+    @getCommandName: (params) ->
+      if params.args? and params.args.operation?
+        params.args.operation
+      else
+        params.payload.command
+
+    @isMavensMateProject: ->
+      settingsPath = atom.project.path + '/config/.settings'
+      oldSettingsPath = atom.project.path + '/config/settings.yaml'
+      return fs.existsSync(settingsPath) or fs.existsSync(oldSettingsPath)
+
+    @isMetadata: (filePath) ->    
+      apex_file_extensions = atom.config.getSettings()['MavensMate-Atom'].mm_apex_file_extensions
+      return this.extension(filePath) in apex_file_extensions
+
+    # filters the selected items against metadata extensions
+    @getSelectedFiles: ->
+      selectedFilePaths = []
+      apex_file_extensions = atom.config.getSettings()['MavensMate-Atom'].mm_apex_file_extensions
+      treeView = this.treeView()
+      if treeView.hasFocus() # clicked in sidebar
+        filePaths = treeView.selectedPaths()
+      else # command palette or right click in editor
+        filePaths = [this.activeFile()]
+      for filePath in filePaths
+        if this.extension(filePath) in apex_file_extensions
+          selectedFilePaths.push(filePath)
+      return selectedFilePaths
+
+    # whether the given file is a trigger or apex class
+    @isClassOrTrigger: (currentFile) ->
+      return currentFile? and (currentFile.indexOf('.trigger') >= 0 or currentFile.indexOf('.cls') >= 0)

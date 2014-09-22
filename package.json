@@ -15,23 +15,26 @@
   "dependencies": {
     "glob": ">=3.2.9",
     "ansi-to-html": ">=0.1.0",
-    "daemon":">=1.1.0",
+    "daemon": ">=1.1.0",
     "express": "4.x",
-    "body-parser" : "1.5.2",
+    "body-parser": "1.5.2",
     "serve-index": "latest",
     "portfinder": "latest",
     "open": "latest",
     "q": "^1.0.1",
-    "node-uuid" : "1.4.1",
-    "emissary" : "1.2.1",
+    "node-uuid": "1.4.1",
+    "emissary": "1.2.1",
     "jquery": "2.1.0",
-    "cloneextend" : "0.0.3",
-    "watchjs" : "latest",
+    "cloneextend": "0.0.3",
+    "watchjs": "latest",
     "autocomplete-plus": "git://github.com/saschagehlich/autocomplete-plus.git#feature/api",
     "fuzzaldrin": "~1.0.0",
     "underscore-plus": "1.x",
     "underscore.string": "2.3.x",
-    "loophole" : "1.0.0"
+    "loophole": "1.0.0",
+    "adm-zip": "^0.4.4",
+    "request": "^2.44.0",
+    "tar": "^1.0.1"
   },
   "devDependencies": {
     "temp": "latest"

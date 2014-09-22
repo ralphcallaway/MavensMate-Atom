@@ -4,11 +4,13 @@ MavensMate = require './mavensmate'
 module.exports =
 
   configDefaults:
-    mm_location: 'mm/mm.py'
+    mm_path: 'default'
+    mm_python_path: ''
+    mm_mm_py_location: ''
+    mm_developer_mode: false
     mm_compile_on_save : true
     mm_api_version : '30.0'
     mm_log_location : ''
-    mm_python_location : '/usr/bin/python'
     mm_workspace : ['/one/cool/workspace', '/one/not-so-cool/workspace']
     mm_open_project_on_create : true
     mm_log_level : 'DEBUG'
