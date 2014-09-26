@@ -16,11 +16,11 @@ describe 'MavensMate Installer', ->
       promise = runInstaller { targetVersion: MMInstaller.V_PRE_RELEASE }
       promise.then(
         (result) ->
-          expect(result.finalVersion).toEqual(['0','2','4'])
+          expect(result.finalVersion).toEqual('0.2.4')
           expect(result.initialVersion).toEqual(null)
           expect(result.newVersionInstalled).toBeTruthy()
           expect(util.isMMInstalled()).toBeTruthy()
-          expect(util.getMMVersion()).toEqual(['0','2','4'])
+          expect(util.getMMVersion()).toEqual('0.2.4')
         (error) ->
           expect(error).toBeUndefined()
       )
@@ -31,11 +31,11 @@ describe 'MavensMate Installer', ->
       promise = runInstaller { targetVersion: MMInstaller.V_LATEST }
       promise.then(
         (result) ->
-          expect(result.finalVersion).toEqual(['0','2','3'])
+          expect(result.finalVersion).toEqual('0.2.3')
           expect(result.initialVersion).toEqual(null)
           expect(result.newVersionInstalled).toBeTruthy()
           expect(util.isMMInstalled()).toBeTruthy()
-          expect(util.getMMVersion()).toEqual(['0','2','3'])
+          expect(util.getMMVersion()).toEqual('0.2.3')
         (error) ->
           expect(error).toBeUndefined()
       )
@@ -47,11 +47,11 @@ describe 'MavensMate Installer', ->
       promise = runInstaller { targetVersion: 'v0.2.0' }
       promise.then(
         (result) ->
-          expect(result.finalVersion).toEqual(['0','2','0'])
+          expect(result.finalVersion).toEqual('0.2.0')
           expect(result.initialVersion).toEqual(null)
           expect(result.newVersionInstalled).toBeTruthy()
           expect(util.isMMInstalled()).toBeTruthy()
-          expect(util.getMMVersion()).toEqual(['0','2','0'])
+          expect(util.getMMVersion()).toEqual('0.2.0')
         (error) ->
           expect(error).toBeUndefined()
       )
@@ -67,72 +67,72 @@ describe 'MavensMate Installer', ->
         (error) ->
           expect(error).toBeDefined()
           expect(util.isMMInstalled()).not.toBeTruthy()
-          expect(util.getMMVersion()).toBeUndefined()
+          expect(util.getMMVersion()).toEqual(null)
       )
 
   describe 'non-forced install', ->
     it "shouldn't do anything if the current version is the same", ->
-      util.setMMVersion ['0','2','3']
+      util.setMMVersion '0.2.3'
       promise = runInstaller { targetVersion: MMInstaller.V_LATEST, force: false }
       promise.then(
         (result) ->
-          expect(result.finalVersion).toEqual(['0','2','3'])
-          expect(result.initialVersion).toEqual(['0','2','3'])
+          expect(result.finalVersion).toEqual('0.2.3')
+          expect(result.initialVersion).toEqual('0.2.3')
           expect(result.newVersionInstalled).not.toBeTruthy()
-          expect(util.getMMVersion()).toEqual(['0','2','3'])
+          expect(util.getMMVersion()).toEqual('0.2.3')
         (error) ->
           expect(error).toBeUndefined()
       )
 
     it "should install if the requested version is newer", ->
-      util.setMMVersion ['0','2','3']
+      util.setMMVersion '0.2.3'
       promise = runInstaller { targetVersion: MMInstaller.V_PRE_RELEASE, force: false }
       promise.then(
         (result) ->
-          expect(result.finalVersion).toEqual(['0','2','4'])
-          expect(result.initialVersion).toEqual(['0','2','3'])
+          expect(result.finalVersion).toEqual('0.2.4')
+          expect(result.initialVersion).toEqual('0.2.3')
           expect(result.newVersionInstalled).toBeTruthy()
-          expect(util.getMMVersion()).toEqual(['0','2','4'])
+          expect(util.getMMVersion()).toEqual('0.2.4')
         (error) ->
           expect(error).toBeUndefined()
       )
 
     it "shouldn't do anything if the current version is newer", ->
-      util.setMMVersion ['0','2','4']
+      util.setMMVersion '0.2.4'
       promise = runInstaller { targetVersion: MMInstaller.V_LATEST, force: false }
       promise.then(
         (result) ->
-          expect(result.finalVersion).toEqual(['0','2','4'])
-          expect(result.initialVersion).toEqual(['0','2','4'])
+          expect(result.finalVersion).toEqual('0.2.4')
+          expect(result.initialVersion).toEqual('0.2.4')
           expect(result.newVersionInstalled).not.toBeTruthy()
-          expect(util.getMMVersion()).toEqual(['0','2','4'])
+          expect(util.getMMVersion()).toEqual('0.2.4')
         (error) ->
           expect(error).toBeUndefined()
       )
 
   describe 'forced install', ->
     it "should install even if the current version is the same", ->
-      util.setMMVersion ['0','2','3']
+      util.setMMVersion '0.2.3'
       promise = runInstaller { targetVersion: MMInstaller.V_LATEST, force: true }
       promise.then(
         (result) ->
-          expect(result.finalVersion).toEqual(['0','2','3'])
-          expect(result.initialVersion).toEqual(['0','2','3'])
+          expect(result.finalVersion).toEqual('0.2.3')
+          expect(result.initialVersion).toEqual('0.2.3')
           expect(result.newVersionInstalled).toBeTruthy()
-          expect(util.getMMVersion()).toEqual(['0','2','3'])
+          expect(util.getMMVersion()).toEqual('0.2.3')
         (error) ->
           expect(error).toBeUndefined()
       )
 
     it "should install even if the current version is newer", ->
-      util.setMMVersion ['0','2','4']
+      util.setMMVersion '0.2.4'
       promise = runInstaller { targetVersion: MMInstaller.V_LATEST, force: true }
       promise.then(
         (result) ->
-          expect(result.finalVersion).toEqual(['0','2','3'])
-          expect(result.initialVersion).toEqual(['0','2','4'])
+          expect(result.finalVersion).toEqual('0.2.3')
+          expect(result.initialVersion).toEqual('0.2.4')
           expect(result.newVersionInstalled).toBeTruthy()
-          expect(util.getMMVersion()).toEqual(['0','2','3'])
+          expect(util.getMMVersion()).toEqual('0.2.3')
         (error) ->
           expect(error).toBeUndefined()
       )

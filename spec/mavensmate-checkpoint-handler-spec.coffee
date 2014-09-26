@@ -4,7 +4,7 @@ emitter = require('../lib/mavensmate-emitter').pubsub
 MavensMateCheckpointHandler = require '../lib/mavensmate-checkpoint-handler'
 {Editor, EditorView, WorkspaceView, $} = require 'atom'
 
-describe 'MavensMate Checkpoint Handler', ->
+xdescribe 'MavensMate Checkpoint Handler', ->
 
   beforeEach ->
     atom.project.setPath(path.join(__dirname, 'fixtures', 'testProject'))

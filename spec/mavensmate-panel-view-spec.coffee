@@ -7,10 +7,10 @@ temp.track();
 
 {WorkspaceView} = require 'atom'
 emitter = require('../lib/mavensmate-emitter').pubsub
-{panel} = require '../lib/mavensmate-panel-view'
+{panel} = require '../lib/panel/panel-view'
 {mm}    = require('../lib/mavensmate-cli')
 
-describe 'MavensMate Panel View', ->
+xdescribe 'MavensMate Panel View', ->
   beforeEach ->
     atom.project.setPath(path.join(__dirname, 'fixtures', 'testProject'))
     # set up the workspace

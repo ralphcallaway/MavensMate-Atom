@@ -1,16 +1,22 @@
 describe 'Main Loader', ->
 
-  describe 'settings before activation', ->
-    it "aren't defined", ->
+  describe 'before activation', ->
+    it "settings aren't defined", ->
       expect(atom.config.getSettings()['MavensMate-Atom']).toBeUndefined()
 
-  describe 'settings after activation', ->
+    it "isn't activated", ->
+      expect(atom.packages.activePackages['MavensMate-Atom']).toBeUndefined()
+
+  describe 'after activation', ->
 
     beforeEach ->
       waitsForPromise ->
         atom.packages.activatePackage 'MavensMate-Atom'
 
-    it 'are defined', ->
+    it 'to be activated', ->
+      expect(atom.packages.activePackages['MavensMate-Atom']).toBeDefined()
+
+    it 'settings are defined', ->
       expect(atom.config.getSettings()['MavensMate-Atom']).toBeDefined()
       config = atom.config.getSettings()['MavensMate-Atom']
       expect(config.mm_compile_on_save).toBeDefined()
