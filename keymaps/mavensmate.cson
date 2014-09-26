@@ -1,2 +1,13 @@
 '.workspace':
-  'ctrl-shift-o': 'mavensmate:open-project'
+  'ctrl-alt-o': 'mavensmate:open-project'
+  'ctrl-alt-n': 'mavensmate:new-project'
+  'ctrl-alt-/': 'mavensmate:toggle-panel'
+'.editor':
+  'ctrl-alt-s': 'mavensmate:compile'
+  'ctrl-alt-p': 'mavensmate:compile-project'
+  'ctrl-alt-x': 'mavensmate:run-apex-script'
+  'ctrl-alt-a': 'mavensmate:run-tests'
+  'ctrl-alt-l': 'mavensmate:start-logging'
+  'ctrl-alt-k': 'mavensmate:fetch-logs'
+  'ctrl-alt-t': 'mavensmate:run-all-tests'
+  'ctrl-alt-c': 'mavensmate:clean-project'

@@ -41,7 +41,7 @@ describe 'MavensMate Panel View', ->
       expect(mm.run).toHaveBeenCalled()
       expect(mm.run.mostRecentCall.args[0].args.operation).toBe('run_all_tests')
 
-    it 'should indicate when all tests passed', ->
+    fit 'should indicate when all tests passed', ->
       # create fake params object
       myParams =  {args: {operation: 'run_all_tests'}, promiseId: 'my-fake-promiseId'}
       successResponse = require('./fixtures/mavensmate-panel-view/test_success.json')

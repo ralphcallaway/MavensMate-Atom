@@ -19,7 +19,7 @@ describe 'Main Loader', ->
       expect(config.mm_workspace).toBeDefined()
       expect(config.mm_open_project_on_create).toBeDefined()
       expect(config.mm_log_level).toBeDefined()
-      expect(config.mm_python_path).toBeDefined()
+      expect(config.mm_python_location).toBeDefined()
       expect(config.mm_mm_py_location).toBeDefined()
       expect(config.mm_path).toBeDefined()
       expect(config.mm_developer_mode).toBeDefined()

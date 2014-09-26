@@ -44,9 +44,9 @@ module.exports =
 
     addIframeLoadListener: ->
       document.addEventListener 'mavensmateIframeLoaded', (evt) -> 
-        console.log 'iframe loaded!!!!'
+        # console.log 'iframe loaded!!!!'
         modalId = 'modal-'+evt.detail
-        console.log evt.detail
+        # console.log evt.detail
         $('#'+modalId).find('div.modal-loading').hide()
         $('#'+modalId).find('iframe').fadeIn()
 

@@ -44,16 +44,17 @@
               "buttons": ["Yes", "No"]
             }            
         },
-        "run-all-tests-async": {
+        "run-all-tests": {
             "operation": "run_all_tests"
         },
-        "run-async-unit-tests": {
+        "run-tests": {
             "operation": "test_async",
             "payloadClasses": "activeBaseName"
         },
         "edit-project": {
             "operation": "edit_project",
-            "ui": true
+            "ui": true,
+            "view" : "tab"
         },
         "upgrade-project": {
             "operation": "upgrade_project",
@@ -72,16 +73,17 @@
         "new-visualforce-page": {
             "operation": "new_metadata",
             "ui": true,
-            "payloadMetadata": "Visualforce Page"
+            "payloadMetadata": "ApexPage"
         },
         "new-visualforce-component": {
             "operation": "new_metadata",
             "ui": true,
-            "payloadMetadata": "Visualforce Component"
+            "payloadMetadata": "ApexComponent"
         },
         "run-apex-unit-tests": {
             "operation": "unit_test",
-            "ui": true
+            "ui": true,
+            "view": "tab"
         },
         "deploy-to-server": {
             "operation": "deploy",
@@ -89,7 +91,8 @@
         },
         "execute-apex": {
             "operation": "execute_apex",
-            "ui": true
+            "ui": true,
+            "view" : "tab"
         },
         "new-project-from-existing-directory": {
             "operation": "new_project_from_existing_directory",
@@ -107,14 +110,28 @@
             "operation": "project_health_check",
             "ui": true
         },
-        "new-quick-log": {
-            "operation": "new_quick_trace_flag"
+        "start-logging": {
+            "operation": "start_logging"
         },
         "fetch-logs": {
             "operation": "fetch_logs"
         },
+        "fetch-checkpoints": {
+            "operation": "fetch_checkpoints"
+        },
         "refresh-checkpoints": {
             "operation": "index_apex_overlays"
+        },
+        "refresh-apex-symbols": {
+            "operation": "index_apex"
+        },
+        "get-org-test-coverage": {
+            "operation": "get_org_wide_test_coverage"
+        },
+        "visualforce-live-preview": {
+            "operation": "open_sfdc_url",
+            "payloadFiles": "active",
+            "payloadType": "preview"
         }
     }
 }

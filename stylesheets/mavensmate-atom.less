@@ -1,35 +1,109 @@
 @import "ui-variables";
 @import "octicon-mixins";
+@import 'syntax-variables';
 
-.line-number:before {
-  visibility: hidden;
-  position: relative;
-  bottom: .19em;
-  margin-right: .6em;
-  content: "\f111";
-  font-size:  0.7em;
-  display: inline-block;
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  -webkit-font-smoothing: antialiased;
+/*// This defines all syntax variables that syntax themes must implement when they
+// include a syntax-variables.less file.
+
+// General colors
+@syntax-text-color: #c5c8c6;
+@syntax-cursor-color: white;
+@syntax-selection-color: #444;
+@syntax-selection-flash-color: #eee;
+@syntax-background-color: #1d1f21;
+
+// Guide colors
+@syntax-wrap-guide-color: rgba(197, 200, 198, .1);
+@syntax-indent-guide-color: rgba(197, 200, 198, .2);
+@syntax-invisible-character-color: rgba(197, 200, 198, .2);
+
+// For find and replace markers
+@syntax-result-marker-color: #888;
+@syntax-result-marker-color-selected: white;
+
+// Gutter colors
+@syntax-gutter-text-color: @syntax-text-color;
+@syntax-gutter-text-color-selected: @syntax-gutter-text-color;
+@syntax-gutter-background-color: lighten(@syntax-background-color, 5%);
+@syntax-gutter-background-color-selected: rgba(255, 255, 255, 0.14);
+
+// For git diff info. i.e. in the gutter
+@syntax-color-renamed: #96CBFE;
+@syntax-color-added: #A8FF60;
+@syntax-color-modified: #E9C062;
+@syntax-color-removed: #CC6666;*/
+  
+div.mavensmate-health-check-item {
+  z-index:9998;
 }
 
-.mm-compile-error-gutter {
-  visibility: visible !important;
-  color: white;
-  background-color: red;
+div.highlight.mavensmate-health-check-item > div.region {
+  background-color:@syntax-color-renamed;
+  opacity: 0.2;
+  z-index:9999;
 }
 
-.mm-compile-error-line {
-  visibility: visible !important;
-  background-color: #f233a6;
-  color: white;
+/*div.highlight.mavensmate-health-check-item > div.region:hover {
+  background-color: #000;
+}*/
+
+/*div.highlight.mavensmate-health-check-item > div.region:after {
+  content: "\f05a";
+  position: absolute;
+  top:0px;
+  right:-20px;
+  font-family: 'FontAwesome';
+  color:@syntax-color-renamed;
+}*/
+
+.mavensmate-log-fetched.overlay {
+  color:#fff;
+  background-color: @text-color-info;
+  bottom: 0px !important;
+  top: auto !important;
+  margin-left: -250px !important;
+  left: 50% !important;
+  width: 500px !important;
+  padding:5px 10px;
+}
+
+.mavensmate-share.overlay {
+  color:#fff;
+  background-color: @text-color-info;
+  bottom: 0px !important;
+  top: auto !important;
+  margin-left: -298px !important;
+  left: 50% !important;
+  width: 596px !important;
+/*  -webkit-animation:backgroundColorTransition 5s infinite;
+*/  padding:5px 10px;
+}
+
+.mavensmate-share.overlay i {
+  font-size:13px;
+}
+
+.mavensmate-share.overlay button {
+  margin-left:10px;
+  font-size:13px;
+}
+
+.mavensmate-share.overlay span.message {
+  padding-top:0px;
+  font-size:13px;
+  user-select: all !important;
+  -webkit-user-select: all !important;
+}
+
+@-webkit-keyframes backgroundColorTransition /* Firefox */
+{
+  0%   {background:@text-color-info;}
+  50%  {background:#4c478b;}
+  100%   {background:@text-color-info;}
 }
 
 .mavensmate-output {
   .message {
-    max-height: 150px;
     overflow-y: scroll;
   }
 
@@ -37,6 +111,26 @@
     background: #161719;
     color: #fff;
     font-size: 10px;
+  }
+
+  pre.terminal.active {
+    border-left:5px solid #f8e63c;
+  }
+
+  pre.terminal.success {
+    border-left:5px solid @text-color-success;
+  }
+
+  pre.terminal.warning {
+    border-left:5px solid @text-color-warning;
+  }
+
+  pre.terminal.danger {
+    border-left:5px solid @text-color-error;
+  }
+
+  pre.terminal.info {
+    border-left:5px solid @text-color-info;
   }
 }
 
@@ -116,17 +210,67 @@ svg.busy circle.circle3 {
 }
 
 .mavensmate {
+  .modal-dialog.modal-lg {
+    padding:10px;
+    background: #999;
+    border-radius:3px;
+  }
 
+  .model-content {
+    box-shadow: none;
+  }
 
-  h3 {
-    padding: 11px;
+  .panel-header {
+    padding: 0px;
     margin: 0px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.5);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-    background: #292c2f url('atom://MavensMate-Atom/assets/img/mm.svg') no-repeat;
+    padding-left:0px;  
+    background-color: #292c2f;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .mavensmate-panel-view-resize-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    height: 10px;
+    cursor: row-resize;
+    z-index: 3;
+    width:100%;
+  }
+
+  .block.padded.mavensmate-panel {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .block.padded.mavensmate-panel pre.terminal {
+    -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+
+  h3 {
+    background: url('atom://MavensMate-Atom/assets/img/mm.svg') no-repeat;
     background-size: 16px;
-    background-position: 10px 9px;
-    padding-left:30px;
+    background-position: 0px 0px;
+    margin:0px;
+    font-size:1.3em;
+    padding-left:20px;
+    line-height: 1.3em;
   }
 
   .panel-item {
@@ -145,6 +289,24 @@ svg.busy circle.circle3 {
     progress {
       width:40px;
     }
+  }
+
+  .config > button.btn {
+    display: inline-block;
+    padding-left: 5px;
+    margin-right: 5px;
+
+    &:focus {
+      outline:0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  
+  .btn:focus {
+    outline:0;
   }
 
   .tab-pane {
@@ -206,6 +368,38 @@ svg.busy circle.circle3 {
 
   table.body {
     background: #161719;
+  }
+
+  .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+    border-top: 1px solid darken(@syntax-background-color, 20%);
+  }
+
+  .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
+    background-color: lighten(@syntax-background-color, 10%);    
+  }
+
+  .table-striped > tbody > tr:nth-child(even) > td, .table-striped > tbody > tr:nth-child(even) > th {
+    background-color: lighten(@syntax-background-color, 5%);    
+  }
+
+  tr.active {
+    border-left:5px solid #f8e63c;
+  }
+
+  tr.success {
+    border-left:5px solid @text-color-success;
+  }
+
+  tr.warning {
+    border-left:5px solid @text-color-warning;
+  }
+
+  tr.danger {
+    border-left:5px solid @text-color-error;
+  }
+
+  .btn-errorItem i {
+    margin-left: 10px;
   }
 
   progress.pending::-webkit-progress-value
@@ -272,5 +466,227 @@ svg.busy circle.circle3 {
        -webkit-linear-gradient( left, #009edf, #4e76bb, #85469b
     );
     -webkit-animation: animate-stripes 5s linear infinite;
+  }
+}
+
+
+
+
+.mavensmate-code-helper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  .violation {
+    position: absolute;
+  }
+
+  .code-helper-item-arrow {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: transparent;
+    border-top-width: 0;
+
+    &.violation-warning {
+      border-bottom-color: @text-color-warning;
+    }
+
+    // .error is already defined in /Applications/Atom.app/Contents/Resources/app/static/utilities.less
+    // and it adds unexpected CSS animation.
+    &.violation-error {
+      border-bottom-color: @text-color-error;
+    }
+  }
+
+  .code-helper-item-area {
+    position: absolute;
+    top: 0;
+    z-index:100;
+    cursor: pointer;
+  }
+
+  .violation-border {
+    border-bottom-style: dotted;
+    border-bottom-width: 1px;
+
+    @fadeOutRatio: 20%;
+
+    &.violation-warning {
+      border-bottom-color: fadeout(@text-color-warning, @fadeOutRatio);
+    }
+
+    &.violation-error {
+      border-bottom-color: fadeout(@text-color-error, @fadeOutRatio);
+    }
+  }
+
+  .tooltip {
+    font-family: @font-family;
+    max-width: 430px;
+    width:350px;
+
+    @tooltip-arrow-width: 5px;
+    @tooltip-arrow-distance-from-target: 1px;
+
+    .top() {
+      margin-top: -@tooltip-arrow-distance-from-target;
+      padding: @tooltip-arrow-width 0;
+      .tooltip-arrow {
+        border-bottom-width: 0 !important;
+        border-bottom-color:#ccc !important;
+      }
+    }
+
+    .bottom() {
+      margin-top: @tooltip-arrow-distance-from-target;
+      padding: @tooltip-arrow-width 0;
+      .tooltip-arrow {
+        border-top-width: 0 !important;
+        border-top-color:#ccc !important;
+      }
+    }
+
+    .right() {
+      .tooltip-arrow {
+        left: 0 !important;
+        border-left-width: 0 !important;
+        border-left-color:#ccc !important;
+      }
+    }
+
+    .left() {
+      .tooltip-arrow {
+        left: auto !important;
+        right: 0 !important;
+        border-right-width: 0 !important;
+        border-right-color:#ccc !important;
+      }
+    }
+
+    &.top-right {
+      .top();
+      .right();
+      .tooltip-inner {
+        border-bottom-left-radius: 0 !important;
+        border-top-color: #ccc;
+      }
+    }
+
+    &.bottom-right {
+      .bottom();
+      .right();
+      .tooltip-inner {
+        border-top-left-radius: 0 !important;
+      }
+      .tooltip-arrow {
+        border-bottom-color: #ccc;
+      }
+    }
+
+    &.bottom-left {
+      .bottom();
+      .left();
+      .tooltip-inner {
+        border-top-right-radius: 0 !important;
+      }
+    }
+
+    &.top-left {
+      .top();
+      .left();
+      .tooltip-inner {
+        border-bottom-right-radius: 0 !important;
+      }
+    }
+
+    .tooltip-inner {
+      white-space: pre-wrap;
+      text-align: left;
+      border-radius:5px;
+      border: 5px solid #ccc;
+      padding:0px;
+
+      .modal-content {
+        box-shadow: none;
+        border:none;
+      }
+
+      .modal-header {
+        background-color: #e2e2e2;
+        padding:10px;
+      }
+
+      .modal-footer:before {
+        display:block;
+        content:'';
+      }
+
+      .modal-footer:after {
+        display:block;
+        content:'';
+      }
+
+      .modal-footer {
+        padding:10px;
+      }
+
+      .modal-body div.alert {
+        margin:8px 0px 8px 0px;
+        padding:8px;
+      }
+
+      .info-color {
+        display: none;
+        background-color: @background-color-info;
+      }
+
+      .attachment {
+        margin-top: 5px;
+      }
+
+      code, pre {
+        border: 1px solid transparent;
+      }
+
+      code {
+        text-shadow: none;
+      }
+
+      pre {
+        margin: 5px 0;
+        padding: 4px 8px;
+        white-space: pre;
+        word-wrap: normal;
+        overflow: scroll;
+        font-size: 10px;
+        background-color: transparent;
+        border: 1px solid transparent;
+      }
+
+      @metadata-item-margin: 7px;
+
+      .block-metadata {
+        display: block;
+        margin-left: -@metadata-item-margin;
+      }
+
+      .metadata {
+        .item {
+          margin-left: @metadata-item-margin;
+          padding: 2px 4px;
+          font-size: 10px;
+          font-weight: bold;
+          text-shadow: none;
+          border-radius: 2px;
+
+          color: @text-color-selected;
+          background-color: desaturate(@background-color-info, 25%);
+        }
+      }
+    }
   }
 }

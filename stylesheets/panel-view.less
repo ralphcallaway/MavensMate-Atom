@@ -1,0 +1,40 @@
+@import "ui-variables";
+@import 'syntax-variables';
+
+.mavensmate-test-result {
+
+	p.class-name {
+		font-weight:bold;
+	}
+
+	p.class-name span.Pass {
+		color: @text-color-success;
+	}
+
+	p.class-name span.Fail {
+		color: @text-color-error;
+	}
+
+	p.method-name {
+		padding-left:10px;
+	}
+
+	p.stack {
+		background-color: #323439;
+		padding:20px;
+		border-radius:5px;
+	}
+
+	span.result {
+		font-weight: bold;
+	}
+
+	span.result.Fail {
+		color: @text-color-error;
+	}
+
+	span.result.Pass {
+		color: @text-color-success;
+	}
+
+}

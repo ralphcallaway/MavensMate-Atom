@@ -5,9 +5,9 @@
       {
         'label': 'Project'
         'submenu': [
-          { 'label': 'Open Project', 'command': 'mavensmate:open-project' }
-          { 'label': 'New Project', 'command': 'mavensmate:new-project' }
-          { 'label': 'Edit Project', 'command': 'mavensmate:edit-project' }
+          { 'label': 'Open Project...', 'command': 'mavensmate:open-project' }
+          { 'label': 'New Project...', 'command': 'mavensmate:new-project' }
+          { 'label': 'Edit Project...', 'command': 'mavensmate:edit-project' }
           { 'label': 'Compile Project', 'command': 'mavensmate:compile-project' }
           { 'label': 'Clean Project', 'command': 'mavensmate:clean-project' }
         ]
@@ -15,24 +15,22 @@
       {
         'label': 'Metadata'
         'submenu': [
-          { 'label': 'New Apex Class', 'command': 'mavensmate:new-apex-class' }
-          { 'label': 'New Apex Trigger', 'command': 'mavensmate:run-tests' }
-          { 'label': 'New VisualForce Page', 'command': 'mavensmate:run-tests' }
-          { 'label': 'New Visualforce Component', 'command': 'mavensmate:run-tests' }
-          { 'label': 'List Fields For Object... (beta)', 'command': 'mavensmate:run-tests' }
+          { 'label': 'New Apex Class...', 'command': 'mavensmate:new-apex-class' }
+          { 'label': 'New Apex Trigger...', 'command': 'mavensmate:new-apex-trigger' }
+          { 'label': 'New VisualForce Page...', 'command': 'mavensmate:new-visualforce-page' }
+          { 'label': 'New Visualforce Component...', 'command': 'mavensmate:new-visualforce-component' }
+          { 'type' : 'separator' }
+          # { 'label': 'List Fields For Object... (beta)', 'command': 'mavensmate:run-tests' }
           { 'label': 'Update Project Metadata Index (.org_metadata)', 'command': 'mavensmate:index-metadata' }
         ]
       }
       {
         'label': 'Debugging'
         'submenu': [
-          { 'label': 'New Debug Log...', 'command': 'mavensmate:run-unit-tests' }
-          { 'label': 'New Quick Log', 'command': 'mavensmate:new-quick-log' }
+          { 'label': 'Setup Logging For User...', 'command': 'mavensmate:run-unit-tests' }
+          { 'label': 'Start Logging', 'command': 'mavensmate:new-quick-log' }
           { 'label': 'Fetch Logs', 'command': 'mavensmate:fetch-logs' }
-          { 'label': 'Scrub Log', 'command': 'mavensmate:run-unit-tests' }
-          { 'label': 'Delete Trace Flags For This User', 'command': 'mavensmate:run-unit-tests' }
-          { '-': '-' }
-          { 'label': 'Fetch Checkpoints', 'command': 'mavensmate:refresh-checkpoints' }
+          { 'label': 'Stop Logging', 'command': 'mavensmate:run-unit-tests' }
         ]
       }
       {
@@ -44,11 +42,11 @@
           },
           {
             'label': 'Run Async Apex Tests For This Class',
-            'command': 'mavensmate:run-async-unit-tests'
+            'command': 'mavensmate:test_async'
           },
           {
             'label': 'Run All Tests (beta)',
-            'command': 'mavensmate:run-all-tests-async'
+            'command': 'mavensmate:run-all-tests'
           },
           {
             'label': 'Show Apex Code Coverage For This Apex Class',
@@ -75,8 +73,19 @@
           { 'label': 'Toggle Output', 'command': 'mavensmate:toggle-output' }
         ]
       }
-
-
+      { 'type' : 'separator' }
+      {
+        'label': 'Utilities'
+        'submenu': [
+          { 'label': 'Reset Metadata Container', 'command': 'mavensmate:reset-metadata-container' }
+          { 'label': 'Refresh Apex Symbols For This Project', 'command': 'mavensmate:refresh-apex-symbols' }
+        ]
+      }
+      { 'type' : 'separator' }
+      {
+        'label': 'Report Issue on GitHub (search first, please)'
+        'command': ''
+      }
     ]
   }
 ]

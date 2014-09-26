@@ -1,4 +1,4 @@
-'name': 'MMLog'
+'name': 'MavensMate Log'
 'patterns': [
   {
     'match': '\\s*Result: Success'
@@ -32,5 +32,8 @@
     'match': '(true|false)'
     'name': 'keyword'
   }
+]
+'fileTypes': [
+  'log'
 ]
 'scopeName': 'source.log'

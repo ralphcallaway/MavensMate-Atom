@@ -31,14 +31,14 @@ module.exports =
       me = @
 
       # when a promise is enqueued, set busy flag to true
-      emitter.on 'mavensmatePromiseEnqueued', ->
+      emitter.on 'mavensmate:promise-enqueued', ->
         me.setBusy true
         return
 
       # when a promise is completed, check the tracker to see whether there are pending promises
       # if there are not, set busy flag to false
-      emitter.on 'mavensmatePromiseCompleted', ->
-        console.log 'mavensmatePromiseCompleted FROM STATUS BAR ====>'
+      emitter.on 'mavensmate:promise-completed', ->
+        # console.log 'mavensmate:promise-completed FROM STATUS BAR ====>'
         if Object.keys(tracker.tracked).length is 0
           me.setBusy false
         return

@@ -6,6 +6,9 @@ request = require 'request'
 tar     = require 'tar'
 temp    = require 'temp'
 util    = require './mavensmate-util'
+semver  = require 'semver'
+config  = require('./mavensmate-config').config
+moment  = require 'moment'
 
 module.exports = 
 
@@ -50,7 +53,7 @@ module.exports =
       console.debug "constructor launched, targetVersion: #{@_targetVersion}, force: #{@_force}"
 
       # initialize return
-      @_result.initialVersion = util.getMMVersion() or null
+      @_result.initialVersion = util.getMMVersion() or null # todo: move to mavensmate.json
       @_result.opts = opts
       @_result.finalVersion = util.getMMVersion() or null
       @_result.newVersionInstalled = false
@@ -86,7 +89,11 @@ module.exports =
       # - force install requested
       # - mm isn't installed yet
       # - version to install is newer than currently installed version
-      @_versionToInstall = @_parseVersion releaseData.name 
+      @_versionToInstall = @_parseVersion releaseData.tag_name 
+      console.debug 'version to install is: '
+      console.debug @_versionToInstall
+      console.debug 'current version is: '
+      console.debug util.getMMVersion()
       if @_force or not util.isMMInstalled() or @_versionCompare(@_versionToInstall, util.getMMVersion()) == 1
         downloadURL = @_findDownloadURL releaseData, util.platform()
         
@@ -139,8 +146,12 @@ module.exports =
         @_errorHandler "Error extracting mm. Error: #{error}"
         return
 
+      # todo: need to handle the different ways users set mm_path
       # mark as executable on *nix
-      fs.chmodSync("#{util.mmHome()}/mm", '0100') unless util.isWindows()
+      p = path.join(util.mmHome(),'mm')
+      pathStat = fs.lstatSync(p)
+      if pathStat.isFile()
+        fs.chmodSync(p, '0100') unless util.isWindows()
 
       # update current version and report success 
       util.setMMVersion @_versionToInstall
@@ -161,7 +172,7 @@ module.exports =
     # downloads the target url then hands off to callback
     _download: (url, callback) =>
       # RC-TODO: change to use temp directory
-      downloadPath = path.join temp.mkDirSync(), 'mm.zip'
+      downloadPath = path.join temp.mkdirSync(), 'mm.zip'
       downloadStream = fs.createWriteStream downloadPath
       r = request(url).pipe(downloadStream)
       r.on 'error', (err) ->
@@ -171,6 +182,23 @@ module.exports =
 
     # get the latest release data from github and pass on to the callback
     _getReleases: (url, callback) ->
+      cachedReleases = config.get('mm_releases')
+
+      # if we have cached releases, check the last time we cached them
+      # if the last time we cached releases is less than 60 minutes, use the cached releases
+      # otherwise, go to the github server
+      # we do this to prevent rate limiting from github
+      if cachedReleases? and cachedReleases.date? and cachedReleases.releases?
+        now = moment()
+        cacheDate = moment(cachedReleases.date)
+        minutesSinceCached = now.diff(cacheDate, 'minutes')
+          
+        console.debug 'minutes since last releases cache: '+minutesSinceCached
+
+        if minutesSinceCached < 60
+          callback null, cachedReleases.releases 
+          return
+
       request { 
         url: url, 
         json: true,
@@ -178,6 +206,10 @@ module.exports =
           'User-Agent': 'request'
         }
       }, (err, resp, body) ->
+        settingValue =
+          date: moment()
+          releases: body
+        config.set('mm_releases', settingValue)
         callback err, body      
 
     # locates asset in release data for specified platform
@@ -198,7 +230,7 @@ module.exports =
       latestVersion = null
       # could probably do this a bit cleaner with a map/filter/sort combo
       for releaseData in releasesData
-        version = @_parseVersion releaseData.name
+        version = @_parseVersion releaseData.tag_name
         # loop for the highest version for latest or pre-release
         if targetRelease == @constructor.V_LATEST or targetRelease == @constructor.V_PRE_RELEASE
           if targetRelease == @constructor.V_PRE_RELEASE or releaseData.prerelease == false
@@ -219,20 +251,9 @@ module.exports =
 
     # returns 1 if left version is greater than right version, 0 if equal
     # -1 if the left version is less than the right version
-    # expects version to be an array, e.g. v0.2.4 => [0,2,4]
     _versionCompare: (leftVersion, rightVersion) ->
-      if leftVersion[0] > rightVersion[0]
-        1
-      else if leftVersion[0] == rightVersion[0] and leftVersion[1] > rightVersion[1]
-        1
-      else if leftVersion[1] == rightVersion[1] and leftVersion[2] > rightVersion[2]
-        1
-      else if leftVersion[2] == rightVersion[2]
-        0
-      else
-        -1
+      semver.compare(leftVersion, rightVersion)
 
-    # parse a release version from the github data into an array 
-    # of major/minor/point versions
+    # parse a release version from the github data
     _parseVersion: (rawVersion) ->
-      rawVersion.replace('v','').split '.'
+      return semver.valid(rawVersion) 
