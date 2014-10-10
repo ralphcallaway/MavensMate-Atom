@@ -11,7 +11,7 @@
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0",
-    "node":"*"
+    "node": "*"
   },
   "dependencies": {
     "glob": ">=3.2.9",
@@ -21,7 +21,7 @@
     "body-parser": "1.5.2",
     "serve-index": "latest",
     "portfinder": "latest",
-    "open": "latest",
+    "open": "0.0.5",
     "q": "^1.0.1",
     "node-uuid": "1.4.1",
     "emissary": "1.2.1",
@@ -37,22 +37,21 @@
     "request": "^2.44.0",
     "tar": "^1.0.1",
     "moment": "2.8.3",
-    "lodash":"2.4.1",
-    "color":"0.7.1",
-    "open":"0.0.5",
-    "repeat":"0.0.6",
+    "lodash": "2.4.1",
+    "color": "0.7.1",
+    "repeat": "0.0.6",
     "pluralize": "1.0.1",
     "firebase": "1.0.21",
-    "lodash":"2.4.1",
-    "color":"0.7.1",
-    "tmp":"0.0.24",
-    "faye":"0.8.11",
-    "watchr":"2.4.11",
-    "typechecker":"2.0.8",
-    "semver":"3.0.1"
+    "tmp": "0.0.24",
+    "faye": "0.8.11",
+    "watchr": "2.4.11",
+    "typechecker": "2.0.8",
+    "semver": "3.0.1",
+    "rimraf": "^2.2.8"
   },
   "devDependencies": {
-    "temp": "latest"
+    "temp": "latest",
+    "rimraf": "^2.2.8"
   },
   "readme": "MavensMate plugin for Atom text editor",
   "readmeFilename": "README.md",

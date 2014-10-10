@@ -1,6 +1,7 @@
 MMInstaller   = require '../lib/mavensmate-installer'
 util          = require '../lib/mavensmate-util'
 path          = require 'path'
+temp          = require 'temp'
 
 # scroll to bottom for helper methods
 
@@ -133,6 +134,33 @@ describe 'MavensMate Installer', ->
           expect(result.initialVersion).toEqual('0.2.4')
           expect(result.newVersionInstalled).toBeTruthy()
           expect(util.getMMVersion()).toEqual('0.2.3')
+        (error) ->
+          expect(error).toBeUndefined()
+      )
+
+  describe 'installation path', ->
+    it "should be home/mm if mm_path is default", ->
+      util.setMMVersion null
+      atom.config.set 'MavensMate-Atom.mm_path', 'default'
+      promise = runInstaller { targetVersion: MMInstaller.V_LATEST }
+      promise.then(
+        (result) ->
+          expect(util.isMMInstalled()).toBeTruthy()
+          expect(fs.existsSync(path.join(
+            atom.packages.resolvePackagePath('MavensMate-Atom'),'mm/mm'))).toBeTruthy()
+        (error) ->
+          expect(error).toBeUndefined()
+      )
+
+    it "should use mm_path/mm if custom mm_path set", ->
+      util.setMMVersion null
+      testPath = temp.mkdirSync()
+      atom.config.set 'MavensMate-Atom.mm_path', testPath
+      promise = runInstaller { targetVersion: MMInstaller.V_LATEST }
+      promise.then(
+        (result) ->
+          expect(util.isMMInstalled()).toBeTruthy()
+          expect(fs.existsSync(path.join(testPath,'mm'))).toBeTruthy()
         (error) ->
           expect(error).toBeUndefined()
       )
