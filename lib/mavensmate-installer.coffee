@@ -1,14 +1,15 @@
 AdmZip  = require 'adm-zip'
+config  = require('./mavensmate-config').config
 fs      = require 'fs'
+moment  = require 'moment'
 path    = require 'path'
 Q       = require 'q'
 request = require 'request'
+rimraf  = require 'rimraf'
+semver  = require 'semver'
 tar     = require 'tar'
 temp    = require 'temp'
 util    = require './mavensmate-util'
-semver  = require 'semver'
-config  = require('./mavensmate-config').config
-moment  = require 'moment'
 
 module.exports = 
 
@@ -117,13 +118,12 @@ module.exports =
         @_errorHandler "Unable to download mm asset. Error: #{error}"
         return
 
-      # RC-TODO: figure out what happens if package upgrades, need to figure 
-      # out whether this install folder works ...
-      extractPath = util.mmPackageHome()
+      
+      @_extractPath = temp.mkdirSync()
 
       if util.extension(downloadPath) == '.tar.gz'
         fs.createReadStream(downloadPath)
-          .pipe(tar.Extract({ path: extractPath }))
+          .pipe(tar.Extract({ path: @_extractPath }))
           .on "error", (error) =>
             @_extractHandler er, downloadPath
           .on "end", () =>
@@ -132,19 +132,28 @@ module.exports =
       # assuming if it's not a tar ball it's a zip
       else
         zip = new AdmZip downloadPath
-        zip.extractAllTo extractPath, true # overwrite
+        zip.extractAllTo @_extractPath, true # overwrite
         @_extractHandler null, downloadPath
+
 
     # clean up download, and report errors and success
     _extractHandler: (error, downloadPath) =>
+
       # clean up download as long as we're not using the spec version
       if downloadPath and downloadPath.indexOf('spec') == -1
-        fs.unlink downloadPath 
+        fs.unlinkSync downloadPath 
 
       # bail if we have an error
       if error
         @_errorHandler "Error extracting mm. Error: #{error}"
         return
+
+      # RC-TODO: figure out what happens if package upgrades, need to figure 
+      # out whether this install folder works ...
+      # swap out current contents and delete extract path
+      rimraf.sync util.mmHome()
+      fs.renameSync "#{@_extractPath}/mm", util.mmHome()
+      rimraf.sync @_extractPath
 
       # todo: need to handle the different ways users set mm_path
       # mark as executable on *nix
