@@ -1,12 +1,58 @@
-{mm}    = require('../lib/mavensmate-cli')
+{mm}    = require '../lib/mavensmate-cli'
+util    = require '../lib/mavensmate-util'
 
 describe 'MavensMate Client', ->
   beforeEach ->
-
-    #activate the mavesmate package
     waitsForPromise ->
       atom.packages.activatePackage 'MavensMate-Atom'
 
-  # RC-TODO: add some new tests in here
-  it "should eventually have a test suite", ->
-    expect("but not yet").toBeDefined()
+  describe "executable choice", ->
+
+    describe "with default mm path", ->
+
+      it "should use the pre-installed mm.exe on windows", ->
+        [cmd] = runExecutableTest 'windows', 'default'
+        expect(cmd).toEqual("#{atom.packages.resolvePackagePath('MavensMate-Atom')}/mm/mm.exe")
+
+      it "should use the pre-installed mm on non-windows", ->
+        [cmd] = runExecutableTest 'linux', 'default'
+        expect(cmd).toEqual("#{atom.packages.resolvePackagePath('MavensMate-Atom')}/mm/mm")
+
+      it "should complain if mm file doesn't exist at mm path", ->
+        expect("incomplete test").not.toBeDefined()
+
+      it "should complain if mm isn't executable on non-windows", ->
+        expect("incomplete test").not.toBeDefined()
+
+    describe "with custom mm path", ->
+
+      it "should use mm.exe at mm path on windows", ->
+        expect("incomplete test").not.toBeDefined()
+
+      it "should use mm at mm path on non-windows", ->
+        expect("incomplete test").not.toBeDefined()
+
+      it "should complain if mm field doesn't exist mm path", ->
+        expect("incomplete test").not.toBeDefined()
+
+    describe "with developer mode", ->
+
+      it "should use the user defined python and mm.py path", ->
+        expect("incomplete test").not.toBeDefined()
+
+      it "should complain if python doesn't exist", ->
+        expect("incomplete test").not.toBeDefined()
+
+      it "should complain if python isn't executable", ->
+        expect("incomplete test").not.toBeDefined()
+
+      it "should work with standard python if mm_py_path not defined", ->
+        expect("incomplete test").not.toBeDefined()
+
+      it "should complain if mm_py_path not defined and python not on path", ->
+        expect("incomplete test").not.toBeDefined()
+
+
+runExecutableTest = (platform, mmPath) ->
+  spyOn(util, 'platform').andReturn(platform)
+  atom.config.set('MavensMate-Atom.mm_path', mmPath)
