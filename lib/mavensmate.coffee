@@ -80,6 +80,14 @@ module.exports =
     #
     # Returns nothing.
     init: -> 
+
+      if atom.config.get('MavensMate-Atom.mm_auto_install_mm_updates')
+        if atom.config.get('MavensMate-Atom.mm_beta_user')
+          @mmInstaller = new MMInstaller({ targetVersion: MMInstaller.V_PRERELEASE })
+        else
+          @mmInstaller = new MMInstaller()
+        @mmInstaller.install()
+
       # opens MavensMate UI in an Atom tab
       atom.workspace.registerOpener (uri, params) ->
         createTabView(params) if uri is tabViewUri
@@ -91,10 +99,6 @@ module.exports =
       atom.workspaceView.mavensMateProjectInitialized ?= false
       console.log 'initing mavensmate.coffee'
       #@promiseTracker = new MavensMatePromiseTracker()
-
-      # download latest version of release if needed
-      @mm_installer = new MMInstaller()
-      @mm_installer.install()
 
       # instantiate mm tool
       @mm = MavensMateCommandLineInterface
