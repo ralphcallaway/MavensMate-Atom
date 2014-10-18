@@ -1,4 +1,3 @@
-{$} = require 'atom'
 MavensMate = require './mavensmate'
 
 module.exports =
@@ -52,6 +51,7 @@ module.exports =
 
   deactivate: =>
     console.log 'deactivating mavensmate'
-    @mavensmate.destroy()
-    delete @mavensmate
+    if @mavensmate
+      @mavensmate.destroy()
+      delete @mavensmate
 

@@ -1,4 +1,4 @@
-{$, $$, $$$, EditorView, View} = require 'atom'
+{$, $$, $$$, EditorView, View, WorkspaceView} = require 'atom'
 fs    = require 'fs'
 path  = require 'path'
 {Subscriber,Emitter}                = require 'emissary'
@@ -81,9 +81,14 @@ module.exports =
     # Returns nothing.
     init: -> 
 
+      atom.workspaceView = new WorkspaceView() unless atom.workspaceView
+
       if atom.config.get('MavensMate-Atom.mm_auto_install_mm_updates')
         if atom.config.get('MavensMate-Atom.mm_beta_user')
-          @mmInstaller = new MMInstaller({ targetVersion: MMInstaller.V_PRERELEASE })
+          # @mmInstaller = new MMInstaller({ targetVersion: MMInstaller.V_PRERELEASE })
+          # RC - couldn't figure out why, but MMInstaller.V_PRE_RELEASE is always null here, so just skipping 
+          # using the constants
+          @mmInstaller = new MMInstaller({ targetVersion: 'pre-release' })
         else
           @mmInstaller = new MMInstaller()
         @mmInstaller.install()
