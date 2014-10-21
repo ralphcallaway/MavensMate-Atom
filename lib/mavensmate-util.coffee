@@ -124,12 +124,17 @@ module.exports =
     @isWindows: ->
       @platform() == 'windows'
 
-    # returns full path for mm core api
+    # returns full path to the mm core api
+    # the default value for mm_path is "default" which refers to ~/.atom/storage (on osx)
+    # if mm_path is custom (not default), this will return the full path to the executable
     @mmHome: ->
       if atom.config.get('MavensMate-Atom.mm_path') == 'default'
-        path.join(@mmPackageHome(),'mm')
+        path.join(atom.getConfigDirPath(), 'storage')
       else
         atom.config.get('MavensMate-Atom.mm_path')
+
+    @isStandardMmConfiguration: ->
+      atom.config.get('MavensMate-Atom.mm_path') == 'default'  
 
     # returns full path for atom package home
     @mmPackageHome: ->
@@ -225,7 +230,9 @@ module.exports =
         'delete_apex_overlay',
         'index_apex_overlays',
         'new_metadata',
-        'unit_test'
+        'unit_test',
+        'list_metadata',
+        'edit_project'
       ]
 
     # returns platform flag (windows|osx|linux[default])

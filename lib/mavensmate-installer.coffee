@@ -1,5 +1,3 @@
-AdmZip  = require 'adm-zip'
-config  = require('./mavensmate-config').config
 fs      = require 'fs'
 moment  = require 'moment'
 path    = require 'path'
@@ -10,6 +8,11 @@ semver  = require 'semver'
 tar     = require 'tar'
 temp    = require 'temp'
 util    = require './mavensmate-util'
+semver  = require 'semver'
+config  = require('./mavensmate-config').config
+moment  = require 'moment'
+{allowUnsafeEval, allowUnsafeNewFunction} = require 'loophole'
+unzip = allowUnsafeNewFunction -> allowUnsafeEval -> require 'unzip'
 
 module.exports = 
 
@@ -26,8 +29,10 @@ module.exports =
     _targetVersion: null
     _force: null
 
+    _betaUser: false
+
     # promise
-    _defferred: null
+    _deferred: null
 
     # result:
     _result: {} 
@@ -46,7 +51,10 @@ module.exports =
     constructor: (opts = {}) ->
       
       # set defaults
-      opts.targetVersion ||= @constructor.V_LATEST
+      if atom.config.get('MavensMate-Atom.mm_beta_user')
+        opts.targetVersion ||= @constructor.V_PRE_RELEASE
+      else
+        opts.targetVersion ||= @constructor.V_LATEST
       opts.force ||= false
 
       @_targetVersion = opts.targetVersion
@@ -61,11 +69,17 @@ module.exports =
       
     # starts install process, returns promise
     install: () ->
-      @_defferred = Q.defer()
+      @_deferred = Q.defer()
 
-      @_getReleases @constructor._RELEASES_URL, @_getReleasesHandler
+      if not util.isStandardMmConfiguration()
+        if fs.existsSync(util.mmHome())
+          @_deferred.resolve true
+        else
+          @_errorHandler "Error: invalid custom mm configuration"
+      else
+        @_getReleases @constructor._RELEASES_URL, @_getReleasesHandler
 
-      @_defferred.promise
+      @_deferred.promise
 
     # continues installation after retrieving releases data from github
     # (RC) there are probably better ways to organize this, but still getting
@@ -77,7 +91,7 @@ module.exports =
       if error
         @_errorHandler "Error getting releases data, error: #{error}"
         return
-        
+       
       releaseData = @_findRelease releasesData, @_targetVersion
 
       # bail if we couldn't find the desired release
@@ -118,8 +132,9 @@ module.exports =
         @_errorHandler "Unable to download mm asset. Error: #{error}"
         return
 
-      
-      @_extractPath = temp.mkdirSync()
+      # RC-TODO: figure out what happens if package upgrades, need to figure 
+      # out whether this install folder works ...
+      extractPath = util.mmHome()
 
       if util.extension(downloadPath) == '.tar.gz'
         fs.createReadStream(downloadPath)
@@ -131,13 +146,40 @@ module.exports =
 
       # assuming if it's not a tar ball it's a zip
       else
-        zip = new AdmZip downloadPath
-        zip.extractAllTo @_extractPath, true # overwrite
-        @_extractHandler null, downloadPath
+        # zip = new AdmZip downloadPath
+        # zip.extractAllTo extractPath, true # overwrite
+        # @_extractHandler null, downloadPath
+        thiz = @
+
+        fs.createReadStream(downloadPath)
+          .pipe(unzip.Extract({ path: extractPath }))
+          .on "error", (error) =>
+            thiz._extractHandler error, downloadPath
+          .on "close", () =>
+            thiz._extractHandler null, downloadPath
+
+        # thiz = @
+        # unzipper = new DecompressZip(downloadPath)
+        # unzipper.on "error", (err) ->
+        #   console.log "Caught an error"
+        #   console.log err
+        #   thiz._extractHandler err, downloadPath
+
+        # unzipper.on "extract", (log) ->
+        #   console.log "Finished extracting"
+        #   thiz._extractHandler null, downloadPath
+
+        # unzipper.extract
+        #   path: extractPath
+        #   filter: (file) ->
+        #     file.type isnt "SymbolicLink"
 
 
     # clean up download, and report errors and success
     _extractHandler: (error, downloadPath) =>
+      console.debug 'extract handler -->'
+      console.log error
+      console.log downloadPath
 
       # clean up download as long as we're not using the spec version
       if downloadPath and downloadPath.indexOf('spec') == -1
@@ -148,19 +190,12 @@ module.exports =
         @_errorHandler "Error extracting mm. Error: #{error}"
         return
 
-      # RC-TODO: figure out what happens if package upgrades, need to figure 
-      # out whether this install folder works ...
-      # swap out current contents and delete extract path
-      rimraf.sync util.mmHome()
-      fs.renameSync "#{@_extractPath}/mm", util.mmHome()
-      rimraf.sync @_extractPath
-
       # todo: need to handle the different ways users set mm_path
       # mark as executable on *nix
-      p = path.join(util.mmHome(),'mm')
+      p = path.join(util.mmHome(),'mm', 'mm')
       pathStat = fs.lstatSync(p)
       if pathStat.isFile()
-        fs.chmodSync(p, '0100') unless util.isWindows()
+        fs.chmodSync(p, '755') unless util.isWindows()
 
       # update current version and report success 
       util.setMMVersion @_versionToInstall
@@ -171,12 +206,12 @@ module.exports =
       @_result.finalVersion = util.getMMVersion()
       @_result.newVersionInstalled = newVersionInstalled
       console.debug "Installation completed successfully. Result: #{JSON.stringify @_result}"
-      @_defferred.resolve @_result
+      @_deferred.resolve @_result
 
     # logs error to console and rejects the promise
     _errorHandler: (errorMessage) =>
       console.error errorMessage
-      @_defferred.reject new Error(errorMessage)
+      @_deferred.reject new Error(errorMessage)
 
     # downloads the target url then hands off to callback
     _download: (url, callback) =>

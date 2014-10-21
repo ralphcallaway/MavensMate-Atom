@@ -105,9 +105,20 @@ class MavensMatePanelView extends View
     # writes status to panel item
     # displays colored indicator based on outcome
     emitter.on 'mavensmate:panel-notify-finish', (params, result, promiseId) ->
+      console.debug 'panel-notify-finish'
+      console.log params
+      console.log result
       # we do a double check here to ensure we're not doing anything with panel exempt commands
       # todo: ensure exempt or skippanel commands are not handled here
-      if params.args.operation? and params.args.operation not in util.panelExemptCommands() and not params.skipPanel # some commands are not piped to the panel
+      if params.payload? and params.payload.command?
+        operation = params.payload.command
+      else if params.args? and params.args.operation?
+        operation = params.args.operation
+
+      console.log 'operation is -=-[-=-=-=-=->'
+      console.log operation
+
+      if operation? and operation not in util.panelExemptCommands() and not params.skipPanel # some commands are not piped to the panel
         console.log 'panel view picked up an event!'
         console.log params
         console.log result

@@ -113,6 +113,9 @@
         "start-logging": {
             "operation": "start_logging"
         },
+        "stop-logging": {
+            "operation": "stop_logging"
+        },
         "fetch-logs": {
             "operation": "fetch_logs"
         },

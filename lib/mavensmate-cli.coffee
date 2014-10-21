@@ -39,8 +39,14 @@ class MavensMateCommandLineInterface
       cmd = cfg.mm_python_location
       opts.push mm_location
     else
-      mm_path = path.join "#{util.mmHome()}","mm"
+      if util.isStandardMmConfiguration()
+        mm_path = path.join(util.mmHome(),'mm','mm')
+      else
+        mm_path = util.mmHome()
+
+      # mm_path = path.join "#{util.mmHome()}","mm"
       mm_path += ".exe" if util.isWindows()
+      console.debug mm_path
       cmd = mm_path
 
     opts.push operation
@@ -101,9 +107,9 @@ class MavensMateCommandLineInterface
   # Execute the command, resolve the promise
   executeAsync: (cmd, opts, stdin, deferred, promiseId) ->
     try
-      # console.log cmd
-      # console.log opts
-      # console.log stdin
+      console.log cmd
+      console.log opts
+      console.log stdin
 
       project = atom.project
 

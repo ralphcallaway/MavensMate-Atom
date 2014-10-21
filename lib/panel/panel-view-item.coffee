@@ -44,9 +44,9 @@ module.exports =
 
     # updates terminal view with result of command
     update: (panel, params, result) ->
-      # console.log 'updating item as a result of command ====>'
-      # console.log params
-      # console.log result
+      console.log 'updating panel item as a result of command ====>'
+      console.log params
+      console.log result
       me = @      
       if @command not in util.panelExemptCommands() and not params.skipPanel
         panelOutput = parseCommand(@command, params, result)

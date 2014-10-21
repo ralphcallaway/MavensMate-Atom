@@ -293,7 +293,7 @@ class RunTestsParser extends CommandParser
 
     return @obj
 
-class StartLoggingParser extends CommandParser
+class LoggingParser extends CommandParser
 
   parse: ->
     if @result.success is false
@@ -324,7 +324,8 @@ parsers = {
   CompileProjectParser: CompileProjectParser,
   RunTestsParser: RunTestsParser,
   TestAsyncParser: RunTestsParser,
-  StartLoggingParser: StartLoggingParser,
+  StartLoggingParser: LoggingParser,
+  StopLoggingParser: LoggingParser,
   GetOrgWideTestCoverageParser: GetOrgWideTestCoverageParser,
   RefreshMetadataParser: RefreshMetadataParser,
   CleanProjectParser: CleanProjectParser,
